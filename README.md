@@ -1,36 +1,212 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="left">
+  
+  # POS Management System
+</div>
 
-## Getting Started
+### <div align="right"><b>Team Project</b></div>
+<br><br>
+## ‣ 프로젝트 개요
+<div align="center"></div>
+<b>POS Management System</b>은 <b>매장 운영자를 위한 종합 관리 플랫폼</b>으로, 메뉴 관리부터 결제 처리, 매출 보고까지 매장 운영의 모든 측면을 한 곳에서 관리할 수 있는 서비스를 제공합니다.
+매장 관리의 복잡성이 증가하면서 메뉴 구성, 주문 처리, 결제, 매출 분석 등 다양한 기능에 대한 수요가 급증하고 있습니다.
+하지만 기존 시스템들은 개별 기능에만 집중되어 있어, 매장 운영자들이 여러 시스템을 번갈아 사용하는 불편함이 있었기에 <b>POS Management System</b>은 이러한 문제를 해결하기 위해 <b>다양한 기능을 통합한 올인원 솔루션</b>을 제공합니다. 
+<br><br>
 
-First, run the development server:
+## ‣ 통합 관리 <br>
+<b>POS Management System</b>은 메뉴 및 카테고리 관리, 주문 처리, 결제 시스템, 매출 보고서 등을 하나의 플랫폼에서 모두 제공하는 <b>통합 시스템</b>입니다. <br>
+이는 매장 운영자가 여러 시스템을 번갈아 사용할 필요 없이 하나의 애플리케이션으로 모든 업무를 해결할 수 있어 경쟁 서비스와 차별화됩니다.
+<br><br>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ‣ 직관적인 인터페이스 <br>
+<b>POS Management System</b>은 그리드 기반 메뉴 레이아웃과 드래그 앤 드롭 인터페이스를 통해 <b>직관적인 메뉴 관리</b>와 <b>효율적인 주문 처리</b>를 제공합니다. <br>
+이는 복잡한 매장 관리 프로세스를 <b>단순화하고 사용자 친화적인 경험을 제공</b>하는 것이 차별화된 점입니다.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<br><br><br><br>
+# 팀원 소개
+|팀원|담당|깃허브|
+|:---:|---|---|
+|<b>홍길동</b>|FRONT|https://github.com/honggildong|
+|김철수|BACK|https://github.com/kimcheolsoo|
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+<br><br>
+# ✲ 기술 스택 및 선정 이유
+<div align="center">
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### FRONT
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Appliance</th>
+      <th>Version</th>
+      <th>선정 이유</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Next.js</td>
+      <td>프레임워크</td>
+      <td>14.0.0</td>
+      <td>SSR/CSR 하이브리드 렌더링과 파일 기반 라우팅을 지원하여 개발 생산성과 SEO를 모두 고려할 수 있어 선택했습니다.</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+      <td>React</td>
+      <td>UI 라이브러리</td>
+      <td>18.2.0</td>
+      <td>컴포넌트 기반 UI 구축 및 상태 관리의 용이성을 위해 선택했습니다.</td>
+    </tr>
+    <tr>
+      <td>Zustand</td>
+      <td>상태 관리</td>
+      <td>4.4.1</td>
+      <td>Redux보다 간결한 코드와 직관적인 API로 전역 상태를 효과적으로 관리할 수 있어 선택했습니다.</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+      <td>React Query</td>
+      <td>데이터 페칭</td>
+      <td>4.0.0</td>
+      <td>서버 상태 관리, 자동 캐싱, 데이터 재검증 기능으로 API 호출을 최적화하기 위해 사용했습니다.</td>
+    </tr>
+    <tr>
+      <td>TailwindCSS</td>
+      <td>CSS 프레임워크</td>
+      <td>3.3.0</td>
+      <td>유틸리티 기반 클래스로 빠른 UI 개발과 일관된 디자인을 유지하기 위해 선택했습니다.</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+      <td>Framer Motion</td>
+      <td>애니메이션 라이브러리</td>
+      <td>10.16.4</td>
+      <td>직관적인 API로 복잡한 애니메이션 효과를 쉽게 구현할 수 있어 사용자 경험 향상을 위해 채택했습니다.</td>
+    </tr>
+    <tr>
+      <td>React DnD</td>
+      <td>드래그 앤 드롭</td>
+      <td>16.0.1</td>
+      <td>메뉴 아이템의 위치를 쉽게 관리할 수 있는 드래그 앤 드롭 기능 구현을 위해 선택했습니다.</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+      <td>Axios</td>
+      <td>HTTP 클라이언트</td>
+      <td>1.6.2</td>
+      <td>인터셉터 기능을 통한 토큰 관리와 요청/응답 처리의 용이성을 위해 사용했습니다.</td>
+    </tr>
+    <tr>
+      <td>react-colorful</td>
+      <td>색상 피커</td>
+      <td>5.6.1</td>
+      <td>메뉴와 카테고리의 색상 커스터마이징을 위한 직관적인 색상 선택 인터페이스를 제공합니다.</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+      <td>date-fns</td>
+      <td>날짜 처리</td>
+      <td>2.30.0</td>
+      <td>가볍고 모듈화된 API로 날짜 처리와 매출 보고서의 기간 설정에 활용했습니다.</td>
+    </tr>
+    <tr>
+      <td>TypeScript</td>
+      <td>정적 타입 언어</td>
+      <td>5.0.4</td>
+      <td>타입 안정성을 통해 개발 단계에서 오류를 조기에 발견하고 코드 품질을 향상시키기 위해 선택했습니다.</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+      <td>Lucide React</td>
+      <td>아이콘 라이브러리</td>
+      <td>0.294.0</td>
+      <td>가볍고 일관된 디자인의 아이콘을 제공하여 UI의 일관성을 유지하기 위해 사용했습니다.</td>
+    </tr>
+    <tr>
+      <td>Vercel</td>
+      <td>배포 플랫폼</td>
+      <td>-</td>
+      <td>Next.js 애플리케이션의 배포와 CI/CD를 간소화하고, 글로벌 CDN을 통한 빠른 로딩 속도를 제공합니다.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<br><br><br>
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+  
+## ‣ 개발 일정
+<b>- 2024.01.15 ~ 2024.03.30</b>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  <br>
+  <br>
+  <br>
+  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ‣ 프로젝트 소개
+  
+### ✅ 사용자 인증 시스템
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### JWT 기반 인증:
+사용자는 이메일 기반 인증을 통해 시스템에 로그인할 수 있으며, JWT(Access Token & Refresh Token)를 활용한 보안 인증 방식을 적용했습니다. <br>
+토큰은 localStorage와 쿠키에 저장되며, Axios 인터셉터를 통한 자동 토큰 갱신 메커니즘으로 세션 만료를 방지합니다. <br>
+매장 접근 시 추가 보안을 위해 4자리 PIN 코드 인증을 적용했습니다. <br><br>
+
+### ✅ POS 화면 및 주문 관리
+
+### 직관적인
+ 그리드 레이아웃: 
+POS 메인 인터페이스는 그리드 레이아웃으로 카테고리와 메뉴 항목을 표시하며, 메뉴 선택 시 실시간으로 주문 패널을 업데이트합니다. <br>
+테이블/장소 선택은 모달 팝업을 통해 이루어지며, 메뉴 캐싱 시스템을 통해 성능을 최적화했습니다. <br>
+스와이프 가능한 메뉴 아이템과 직관적인 주문 프로세스로 사용자 경험을 향상시켰습니다. <br><br>
+  
+### ✅ 결제 시스템
+
+### 다양한 결제 옵션: 
+현금 및 신용카드 결제를 지원하며, 분할 결제 옵션도 제공합니다. <br>
+실시간 잔돈 계산과 애니메이션 효과로 사용자 경험을 개선했으며, 결제 완료 후 영수증 출력 기능을 제공합니다. <br>
+환불 프로세스도 지원하여 포괄적인 결제 시스템을 구현했습니다. <br><br>
+  
+### ✅ 메뉴 및 카테고리 관리
+
+### 드래그 앤 드롭 인터페이스: 
+React DnD를 활용한 직관적인 메뉴 배치 시스템을 제공합니다. <br>
+HexColorPicker를 통해 메뉴와 카테고리의 시각적 스타일링이 가능하며, Full/Half 사이즈 옵션으로 유연한 메뉴 레이아웃을 구성할 수 있습니다. <br>
+변경 사항은 실시간으로 서버에 반영되며, 메뉴 캐싱을 통해 성능을 최적화했습니다. <br><br>
+
+### ✅ 매출 보고 및 분석
+
+### 상세 매출 리포트: 
+일별 및 월별 매출 보고서를 제공하며, 날짜 범위 필터링과 캘린더 뷰를 통해 직관적인 데이터 탐색이 가능합니다. <br>
+주문 상세 정보와 결제 방법별 분석을 제공하며, 취소된 주문도 별도로 확인할 수 있습니다. <br>
+드래그 가능한 계산기 위젯을 제공하여 빠른 계산을 지원합니다. <br><br><br><br><br>
+
+
+
+# ✲ 트러블 슈팅 (Trouble shooting)
+
+### 1. 주문 내역 페이지의 이중 상태 관리 문제<br>
+
+문제: 주문 목록에서 주문을 클릭해도 중간 섹션에 상세 정보가 표시되지 않는 문제가 발생했습니다.<br>
+원인: sortedGroups와 dailyOrders 두 개의 상태가 서로 동기화되지 않고 각자 관리되고 있었습니다.<br>
+해결: dailyOrders를 제거하고 sortedGroups만 사용하도록 상태를 통합했습니다. useEffect를 수정하여 단일 데이터 소스에서 주문을 찾도록 개선했습니다.<br>
+결과: 주문 목록에서 클릭 시 중간 섹션에 상세 정보가 정상적으로 표시되어 사용자 경험이 향상되었습니다.<br>
+
+### 2. 메뉴 ID 누락 문제<br>
+
+문제: 서버에서 받은 데이터에 menuId가 누락되어 메뉴 삭제나 주문 처리가 불가능한 상황이 발생했습니다.<br>
+원인: 백엔드에서 일관되지 않게 menuId를 제공하는 문제가 있었습니다.<br>
+해결: 메뉴 데이터를 캐시에 저장하고, menuId가 없는 경우 메뉴 이름으로 캐시에서 해당 ID를 찾아 채우는 메커니즘을 구현했습니다.<br>
+결과: 모든 메뉴 항목이 유효한 menuId를 가지게 되어 완전한 주문 처리가 가능해졌습니다.<br>
+
+### 3. React 상태 업데이트 지연 문제<br>
+
+문제: 4자리 비밀번호를 입력해도 서버로는 3자리만 전송되는 문제가 발생했습니다.<br>
+원인: React의 비동기 상태 업데이트로 인해 submitPayload() 실행 시점에 password 상태가 아직 업데이트되지 않았습니다.<br>
+해결: Zustand의 getState() 메서드를 사용하여 최신 상태를 직접 접근하는 방식으로 변경했습니다.<br>
+결과: 4자리 비밀번호가 모두 서버로 정확히 전송되어 로그인 및 인증 프로세스가 원활해졌습니다.<br>
+
+### 4. 결제 페이지 성능 최적화<br>
+
+문제: 결제 페이지에서 비용이 큰 계산이 매 렌더링마다 반복 실행되어 성능이 저하되었습니다.<br>
+원인: initialTotal과 changes 계산이 불필요하게 매 렌더링마다 재계산되고 있었습니다.<br>
+해결: useMemo를 사용해 이러한 계산 결과를 메모이제이션하여 의존성이 변경될 때만 재계산하도록 구현했습니다.<br>
+결과: 불필요한 연산이 줄어 성능이 개선되었으며, 특히 주문 항목이 많을 때 효과적으로 작동했습니다.<br>
+
+
+<br><br>
