@@ -25,8 +25,8 @@
 # 팀원 소개
 |팀원|담당|깃허브|
 |:---:|---|---|
-|<b>홍길동</b>|FRONT|https://github.com/honggildong|
-|김철수|BACK|https://github.com/kimcheolsoo|
+|<b>임제훈</b>|FRONT|https://github.com/jehoonje|
+|한기범|BACK|https://github.com/hgb926|
 
 <br><br>
 # ✲ 기술 스택 및 선정 이유
