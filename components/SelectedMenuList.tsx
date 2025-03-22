@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { usePosStore, SelectedItem } from "../store/usePosStore";
+import { usePosStore, SelectedItem, Menu } from "../store/usePosStore";
 import { motion, AnimatePresence } from "framer-motion";
 import AlertModal from "@/components/AlertModal";
 import useAlertModal from "@/hooks/useAlertModal";
@@ -116,9 +116,11 @@ export default function SelectedMenuList() {
       if (orderId) {
         try {
           const { data } = await axiosInstance.get(`/api/orders/detail/${orderId}`);
-          const allMenus = Object.values(usePosStore.getState().menuCache).flat();
+          const allMenus = Object.values(usePosStore.getState().menuCache).flatMap(storeMenus => 
+            Object.values(storeMenus).flat()
+          );
           const formattedItems = data.menuDetail.map((menu: any) => {
-            const cachedMenu = allMenus.find((m) => m.menuName === menu.menuName);
+            const cachedMenu = allMenus.find((m: Menu) => m.menuName === menu.menuName);
             if (!cachedMenu) {
               console.warn(`[fetchOrderDetails] menuCache에서 ${menu.menuName}의 menuId를 찾을 수 없습니다.`);
             }
