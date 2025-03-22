@@ -1,4 +1,3 @@
-// stores/formStore.ts
 import { create } from "zustand";
 
 interface FormState {
@@ -17,9 +16,9 @@ interface FormState {
   selectedDate: string | null;
   dailyOrders: { [date: string]: FullOrder[] };
   isCalculatorModalOpen: boolean;
-  setStoreId: (id: number) => void;
-  setPlaceId: (id: number) => void;
-  setSelectedOrder: (orderId: number, date: string) => void;
+  setStoreId: (id: number | null) => void;
+  setPlaceId: (id: number | null) => void;
+  setSelectedOrder: (orderId: number | null, date: string | null) => void;
   setDailyOrders: (date: string, orders: FullOrder[]) => void;
   setCalculatorModalOpen: (open: boolean) => void;
 }
@@ -58,5 +57,4 @@ export const useFormStore = create<FormState>((set) => ({
     dailyOrders: { ...state.dailyOrders, [date]: orders },
   })),
   setCalculatorModalOpen: (open) => set({ isCalculatorModalOpen: open }),
-
 }));

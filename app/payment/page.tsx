@@ -308,11 +308,13 @@ export default function PaymentPage() {
   const handleReceiptYes = async () => {
     if (orderId) {
       try {
-        const receiptResponse = await axiosInstance.get(
-          `/api/receipts/${orderId}`
-        );
+        const receiptResponse = await axiosInstance.get(`/api/receipts/${orderId}`);
         console.log("영수증 데이터:", receiptResponse.data);
+  
+        // 결제 관련 상태만 초기화
         resetData();
+  
+        // storeId가 유지되므로 바로 /pos로 이동
         router.push("/pos");
       } catch (error: any) {
         console.error("영수증 가져오기 실패:", error.response?.data || error);

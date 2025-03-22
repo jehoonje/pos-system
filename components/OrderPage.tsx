@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { QueryClient, useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { QueryClient, useQuery, useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { useFormStore } from "@/store/formStore";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
@@ -59,11 +59,13 @@ export default function OrderPage() {
       if (!storeId) return [];
       const status = isCancelled ? "cancelled" : "success";
       const response = await axiosInstance.get(`/api/reports/all/${storeId}?status=${status}`);
-      console.log("Order Summaries:", response.data);
+      console.log("Fetched Order Summaries:", response.data); // 디버깅용 로그
       return response.data || [];
     },
     enabled: !!storeId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0, // 캐시 유지 시간 0으로 설정해 항상 최신 데이터 요청
+    gcTime: 0, // 캐시 즉시 만료
+    refetchOnMount: "always", // 마운트 시 항상 다시 가져옴
   });
 
   const sortedSummaries = (isSearching ? searchResults : orderSummaries || []).sort(
@@ -214,7 +216,28 @@ export default function OrderPage() {
     return `${period} ${formattedHours}:${formattedMinutes}`;
   };
 
-  const handleRefund = async () => {
+  const refundMutation = useMutation({
+    mutationFn: async (paymentId: string) => {
+      await axiosInstance.post(`/api/pay/cancel/${paymentId}`);
+    },
+    onSuccess: () => {
+      // success와 cancelled 상태의 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ["orderSummaries", storeId, false] });
+      queryClient.invalidateQueries({ queryKey: ["orderSummaries", storeId, true] });
+      // 즉시 success 데이터 다시 가져오기
+      queryClient.refetchQueries({ queryKey: ["orderSummaries", storeId, false] });
+      if (selectedDate) {
+        queryClient.refetchQueries({ queryKey: ["ordersForDate", storeId, selectedDate] });
+      }
+      setIsRefundModalOpen(false);
+      alert("환불이 성공적으로 처리되었습니다.");
+    },
+    onError: () => {
+      alert("환불 처리 중 오류가 발생했습니다.");
+    },
+  });
+
+  const handleRefund = () => {
     if (!selectedDate) return;
     const selectedOrder = allOrdersMap[selectedDate]?.find(
       (o: Order) => o.orderId === selectedOrderId
@@ -223,14 +246,7 @@ export default function OrderPage() {
       alert("결제 ID가 없습니다.");
       return;
     }
-    try {
-      await axiosInstance.post(`/api/pay/cancel/${selectedOrder.paymentId}`);
-      alert("환불이 성공적으로 처리되었습니다.");
-      setIsRefundModalOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["orderSummaries", storeId] });
-    } catch (err) {
-      alert("환불 처리 중 오류가 발생했습니다.");
-    }
+    refundMutation.mutate(selectedOrder.paymentId.toString());
   };
 
   const handlePrint = async () => {
@@ -386,7 +402,6 @@ export default function OrderPage() {
     queryClient.removeQueries({ queryKey: ["orderSummaries", storeId] });
     queryClient.removeQueries({ queryKey: ["ordersForDate", storeId] });
     queryClient.refetchQueries({ queryKey: ["orderSummaries", storeId, false] });
-    queryClient.refetchQueries({ queryKey: ["ordersForDate", storeId] });
     preloadAllOrders();
   };
 

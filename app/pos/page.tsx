@@ -7,6 +7,7 @@ import CategoryButton from "../../components/CategoryButton";
 import MenuButton from "../../components/PosMenuButton";
 import SelectedMenuList from "../../components/SelectedMenuList";
 import PlaceModal from "../../components/PlaceModal";
+import Cookies from "js-cookie";
 
 interface SelectedItem {
   menuName: string;
@@ -36,77 +37,44 @@ export default function PosPage() {
     orderId,
     placeId,
     fetchUnpaidOrderByPlace,
-    menuCache,
   } = usePosStore();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [showPlaceModal, setShowPlaceModal] = useState(false);
 
-  // 초기 storeId 및 tableName 설정
+  // storeId 초기화 및 데이터 로드
   useEffect(() => {
-    const savedStoreId = localStorage.getItem("currentStoreId");
-    if (savedStoreId) {
-      setStoreId(Number(savedStoreId));
-    } else {
-      setStoreId(null);
-    }
-    setTableName("");
-  }, [setStoreId, setTableName]);
+    const savedStoreId = Cookies.get("currentStoreId");
+    const newStoreId = savedStoreId ? Number(savedStoreId) : null;
 
-  // storeId가 설정되면 카테고리 로드
-  useEffect(() => {
-    if (storeId) {
-      fetchCategories(storeId);
-    }
-  }, [storeId, fetchCategories]);
-
-  // 카테고리가 로드되면 첫 번째 카테고리 선택 및 메뉴 로드
-  useEffect(() => {
-    if (storeId && categories.length > 0) {
-      const firstCategoryId = categories[0].categoryId;
-      console.log("Categories loaded, setting default category:", firstCategoryId);
-      setSelectedCategoryId(firstCategoryId);
-
-      // menuCache에 데이터가 있으면 즉시 currentMenus 설정
-      if (menuCache[firstCategoryId]) {
-        console.log("Using cached menus for category:", firstCategoryId, menuCache[firstCategoryId]);
-        usePosStore.setState({ currentMenus: menuCache[firstCategoryId] });
-      } else {
-        console.log("Fetching menus for default category:", firstCategoryId);
-        fetchMenusByCategory(firstCategoryId);
+    if (newStoreId) {
+      if (newStoreId !== storeId) {
+        setStoreId(newStoreId);
       }
-
-      // 모든 카테고리 메뉴 사전 로드 (옵션)
-      categories.forEach((cat) => {
-        if (!menuCache[cat.categoryId]) {
-          fetchMenusByCategory(cat.categoryId);
+      fetchCategories(newStoreId).then(() => {
+        const state = usePosStore.getState();
+        const firstCategoryId = state.categories[0]?.categoryId;
+        if (firstCategoryId && firstCategoryId !== selectedCategoryId) {
+          setSelectedCategoryId(firstCategoryId);
         }
       });
     }
-  }, [storeId, categories, fetchMenusByCategory, menuCache]);
+  }, [setStoreId, fetchCategories]);
 
-  // selectedCategoryId 변경 시 currentMenus 업데이트
+  // selectedCategoryId 변경 시 메뉴 로드
   useEffect(() => {
-    if (selectedCategoryId) {
-      console.log("Selected category changed:", selectedCategoryId);
-      if (menuCache[selectedCategoryId]) {
-        console.log("Updating currentMenus from cache:", menuCache[selectedCategoryId]);
-        usePosStore.setState({ currentMenus: menuCache[selectedCategoryId] });
-      } else {
-        console.log("Fetching menus for category:", selectedCategoryId);
-        fetchMenusByCategory(selectedCategoryId);
-      }
+    if (selectedCategoryId && storeId) {
+      fetchMenusByCategory(selectedCategoryId, true); // 항상 새 데이터 로드
     }
-  }, [selectedCategoryId, menuCache, fetchMenusByCategory]);
+  }, [selectedCategoryId, storeId, fetchMenusByCategory]);
 
+  // 디버깅 로그 추가
   useEffect(() => {
-    if (storeId && categories.length > 0) {
-      const firstCategoryId = categories[0].categoryId;
-      setSelectedCategoryId(firstCategoryId);
-      fetchMenusByCategory(firstCategoryId, true); // forceReload=true로 강제 호출
-      categories.forEach((cat) => fetchMenusByCategory(cat.categoryId));
-    }
-  }, [storeId, categories, fetchMenusByCategory]);
+    console.log("PosPage - storeId:", storeId);
+    console.log("PosPage - categories:", categories);
+    console.log("PosPage - selectedCategoryId:", selectedCategoryId);
+    console.log("PosPage - currentMenus:", currentMenus);
+  }, [storeId, categories, selectedCategoryId, currentMenus]);
 
   const handleCategoryClick = (catId: number) => {
     setSelectedCategoryId(catId);

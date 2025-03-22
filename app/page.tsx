@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "../lib/axiosInstance";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,7 +12,7 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = Cookies.get("accessToken");
     if (token) {
       router.push("/home");
     }
@@ -19,37 +20,38 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg(""); // 에러 메시지 초기화
-    
+    setErrorMsg("");
+
     try {
-      console.log("Attempting login with:", { email });
-      
       const response = await axiosInstance.post("/auth/login", {
-        email: email,
-        password: password,
+        email,
+        password,
       });
-      
-      console.log("Login response:", response.data);
-      
+
       const { access_token, refresh_token } = response.data;
-      
+
       if (access_token && refresh_token) {
-        // 토큰 저장
-        localStorage.setItem("accessToken", access_token);
-        localStorage.setItem("refreshToken", refresh_token);
-        
-        // 쿠키에 토큰 저장 (미들웨어용)
-        document.cookie = `auth_token=${access_token}; path=/; max-age=86400; SameSite=Lax`;
-        
+        Cookies.set("accessToken", access_token, {
+          expires: 1 / 24, // 1시간
+          secure: true,
+          sameSite: "Strict",
+        });
+        Cookies.set("refreshToken", refresh_token, {
+          expires: 7, // 7일
+          secure: true,
+          sameSite: "Strict",
+        });
+
         if (autoLogin) {
-          localStorage.setItem("autoLogin", "true");
+          Cookies.set("autoLogin", "true", {
+            expires: 7,
+            secure: true,
+            sameSite: "Strict",
+          });
         } else {
-          localStorage.removeItem("autoLogin");
+          Cookies.remove("autoLogin");
         }
-        
-        console.log("Tokens saved, redirecting to /home");
-        
-        // 잠시 대기 후 리디렉션
+
         setTimeout(() => {
           window.location.href = "/home";
         }, 100);
@@ -57,13 +59,9 @@ export default function LoginPage() {
         setErrorMsg("토큰이 응답에 포함되지 않았습니다.");
       }
     } catch (error: any) {
-      console.error("Login failed:", error);
-      console.error("Response data:", error.response?.data);
-      console.error("Status:", error.response?.status);
-      
       setErrorMsg(
-        error.response?.data?.message || 
-        "로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요."
+        error.response?.data?.message ||
+          "로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요."
       );
     }
   };

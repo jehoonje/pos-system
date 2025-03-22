@@ -1,6 +1,7 @@
 export interface OrderSummary {
   totalPrice: number;
   date: string;
+  status: string;
 }
 
 export interface Order {

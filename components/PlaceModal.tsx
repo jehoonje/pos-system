@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
-import { usePosStore, SelectedItem } from "../store/usePosStore"; // SelectedItem 임포트
+import { usePosStore, SelectedItem, Menu } from "../store/usePosStore"; // SelectedItem 임포트
 import { motion, AnimatePresence } from "framer-motion";
+import Cookies from "js-cookie";
 
 interface Place {
   placeId?: number;
@@ -44,11 +45,14 @@ export default function PlaceModal({
   const [newPlaceName, setNewPlaceName] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("currentStoreId");
-    if (saved) {
-      setStoreId(Number(saved));
-    }
-  }, []);
+    const interval = setInterval(() => {
+      const saved = Cookies.get("currentStoreId");
+      if (saved && Number(saved) !== storeId) {
+        setStoreId(Number(saved));
+      }
+    }, 100); // 1초마다 확인
+    return () => clearInterval(interval);
+  }, [storeId]);
 
   useEffect(() => {
     if (storeId) {
@@ -160,7 +164,7 @@ export default function PlaceModal({
           let realMenuId = menu.id ?? menu.menuId ?? null;
           if (!realMenuId && menu.menuName) {
             // menuCache에 있는 해당 이름의 메뉴를 검색
-            const allMenus = Object.values(menuCache).flat();
+            const allMenus = Object.values(menuCache).flatMap((menus) => Object.values(menus).flat());
             const found = allMenus.find((m) => m.menuName === menu.menuName);
             if (found) {
               realMenuId = found.menuId;

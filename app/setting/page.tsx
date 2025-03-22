@@ -3,9 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ShoppingBag,
-  Settings,
   ChevronLeft,
-  SquareChartGantt,
   Archive,
   PanelRightClose,
   ArrowRightLeft,
@@ -13,39 +11,32 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import axiosInstance from "../../lib/axiosInstance";
 import { useFormStore } from "@/store/formStore";
+import { usePosStore } from "@/store/usePosStore";
 import Modal from "@/components/Modal";
+import Cookies from "js-cookie";
 
 export default function SettingPage() {
   const router = useRouter();
   const { storeId, setStoreId } = useFormStore();
+  const { resetData } = usePosStore();
 
-  // 메인 UI (Heading + 6개 버튼) 표시 여부
   const [showMainUI, setShowMainUI] = useState(true);
-  // 메인 UI 페이드아웃 트리거
   const [fadeOutMainUI, setFadeOutMainUI] = useState(false);
-
-  // Edit UI (Edit Items / Edit Categories 버튼) 표시 여부
   const [showEditUI, setShowEditUI] = useState(false);
-  // Edit UI 페이드아웃 트리거
   const [fadeOutEditUI, setFadeOutEditUI] = useState(false);
-  // 영업 마감 상태
   const [showCloseModal, setShowCloseModal] = useState(false);
-  // 미완료 주문 알림 모달 상태
-  const [showIncompleteOrderModal, setShowIncompleteOrderModal] =
-    useState(false);
-  // 미완료 주문 메시지
+  const [showIncompleteOrderModal, setShowIncompleteOrderModal] = useState(false);
   const [incompleteOrderMessage, setIncompleteOrderMessage] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("accessToken");
-      const currentStoreId = localStorage.getItem("currentStoreId");
+      const token = Cookies.get("accessToken");
+      const currentStoreId = Cookies.get("currentStoreId");
 
       if (!token || !currentStoreId) {
         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
         router.push("/");
       } else {
-        // 문자로 저장되어 있으므로 number 변환
         setStoreId(Number(currentStoreId));
       }
     }
@@ -59,72 +50,49 @@ export default function SettingPage() {
     if (!storeId) return;
     try {
       const response = await axiosInstance.post(`/api/times/close/${storeId}`);
-      console.log("response for close: ", response);
-
-      // 응답에 message가 있는지 확인 (미완료 주문이 있는 경우)
       if (
-        response.data &&
-        response.data.message &&
-        response.data.message.includes("아직 완료되지 않은 주문이 존재합니다")
+        response.data?.message?.includes("아직 완료되지 않은 주문이 존재합니다")
       ) {
-        // 미완료 주문 메시지 설정 및 모달 표시
         setIncompleteOrderMessage(response.data.message);
         setShowIncompleteOrderModal(true);
         setShowCloseModal(false);
-
-        // 이 경우 홈으로 이동하지 않음
       } else {
-        // 정상적으로 마감된 경우
-        console.log("Store closed successfully");
         setShowCloseModal(false);
         router.push("/home");
       }
     } catch (error) {
-      console.error("Error closing store:", error);
+      // 오류 처리 생략 (UI에 표시되지 않음)
     }
   };
 
-  /**
-   * Items 버튼 클릭 => 메인 UI를 페이드아웃 -> 제거 -> Edit UI를 페이드인
-   */
   const handleItemsClick = () => {
-    // 1) 메인 UI 페이드아웃 시작
     setFadeOutMainUI(true);
-
-    // 2) 애니메이션(0.4s) 후 메인 UI 제거 + Edit UI 표시
     setTimeout(() => {
       setShowMainUI(false);
-      setFadeOutMainUI(false); // 초기화
+      setFadeOutMainUI(false);
       setShowEditUI(true);
     }, 400);
   };
 
   const handleOrdersClick = () => {
-    router.push("setting/orders");
+    router.push("/setting/orders");
   };
 
   const handleTransferClick = () => {
+    resetData();
+    Cookies.remove("currentStoreId");
     router.push("/home");
   };
 
-  /**
-   * 뒤로가기(상단 화살표) 클릭 시 동작
-   * - 메인 UI가 숨겨져 있으면 => Edit UI를 페이드아웃 -> 제거 -> 메인 UI 페이드인
-   * - 메인 UI가 보이는 상태라면 => /pos 로 페이지 이동
-   */
   const handleBackClick = () => {
     if (showEditUI) {
-      // 1) Edit UI 페이드아웃 시작
       setFadeOutEditUI(true);
-
-      // 2) 0.4s 후 Edit UI 제거 + 메인 UI 표시
       setTimeout(() => {
         setShowEditUI(false);
         setFadeOutEditUI(false);
         setShowMainUI(true);
       }, 400);
     } else {
-      // 메인 UI가 보이는 상태 => POS로 이동
       router.push("/pos");
     }
   };
@@ -148,7 +116,6 @@ export default function SettingPage() {
   return (
     <div className="flex items-center font-mono justify-center h-screen w-screen relative">
       <div className="relative w-4/5 h-4/5 bg-white bg-opacity-20 border border-gray-400 rounded-2xl p-6 flex flex-col justify-center items-center">
-        {/* 왼쪽 상단으로 돌아가기(또는 메인으로 복귀) 버튼 */}
         <button
           onClick={handleBackClick}
           className="absolute top-0 left-0 bg-transparent px-2 py-2 text-gray-500 text-sm rounded hover:text-gray-400"
@@ -156,19 +123,15 @@ export default function SettingPage() {
           <ChevronLeft className="w-8 h-8" />
         </button>
 
-        {/* 메인 UI (Heading + 6개 버튼) */}
         {showMainUI && (
           <div
             className={`flex flex-col items-center justify-start ${
               fadeOutMainUI ? "fade-out fade-out-active" : ""
             }`}
           >
-            {/* Heading */}
             <h1 className="text-[40px] font-sans font-bold text-gray-700 mb-[120px]">
               Customize POS Settings
             </h1>
-
-            {/* 6개 버튼 */}
             <div className="grid grid-cols-2 gap-8 w-full relative">
               <button
                 onClick={handleOrdersClick}
@@ -177,21 +140,13 @@ export default function SettingPage() {
                 <ShoppingBag className="w-6 h-6 mr-2 ml-10" />
                 Orders
               </button>
-              {/* <button
-                className="w-80 h-20 font-bold text-left flex flex-row items-center bg-transparent text-gray-700 border border-gray-500 hover:text-white hover:bg-[#333] rounded-lg shadow-sm"
-              >
-                <SquareChartGantt className="w-6 h-6 mr-2 ml-10" />
-                Management
-              </button> */}
               <button
-                className="w-80 h-20 font-bold text-left flex flex-row items-center bg-transparent text-gray-700 border border-gray-500 hover:text-white hover:bg-[#333] rounded-lg shadow-sm"
                 onClick={handleTransferClick}
+                className="w-80 h-20 font-bold text-left flex flex-row items-center bg-transparent text-gray-700 border border-gray-500 hover:text-white hover:bg-[#333] rounded-lg shadow-sm"
               >
                 <ArrowRightLeft className="w-6 h-6 mr-2 ml-10" />
                 Transfer
               </button>
-
-              {/* Items 버튼 */}
               <button
                 onClick={handleItemsClick}
                 className="w-80 h-20 font-bold text-left flex flex-row items-center bg-transparent text-gray-700 border border-gray-500 hover:text-white hover:bg-[#333] rounded-lg shadow-sm"
@@ -199,13 +154,6 @@ export default function SettingPage() {
                 <Archive className="w-6 h-6 mr-2 ml-10" />
                 Items
               </button>
-
-              {/* <button
-                className="w-80 h-20 font-bold text-left flex flex-row items-center bg-transparent text-gray-700 border border-gray-500 hover:text-white hover:bg-[#333] rounded-lg shadow-sm"
-              >
-                <Settings className="w-6 h-6 mr-2 ml-10" />
-                Settings
-              </button> */}
               <button
                 onClick={handleCloseClick}
                 className="w-80 h-20 font-bold text-left flex flex-row items-center bg-transparent text-gray-700 border border-gray-500 hover:text-white hover:bg-[#333] rounded-lg shadow-sm"
@@ -217,7 +165,6 @@ export default function SettingPage() {
           </div>
         )}
 
-        {/* Edit Items & Edit Categories 버튼 */}
         {showEditUI && (
           <div
             className={`fade-in ${
@@ -247,13 +194,8 @@ export default function SettingPage() {
           </div>
         )}
 
-        {/* Close Business Confirmation Modal */}
-
         {showCloseModal && (
-          <Modal
-            isOpen={showCloseModal}
-            onClose={() => setShowCloseModal(false)}
-          >
+          <Modal isOpen={showCloseModal} onClose={() => setShowCloseModal(false)}>
             <span className="text-md mb-4">영업을 마감하시겠습니까?</span>
             <div className="flex space-x-4">
               <button
@@ -272,7 +214,6 @@ export default function SettingPage() {
           </Modal>
         )}
 
-        {/* Incomplete Order Alert Modal */}
         <AnimatePresence>
           {showIncompleteOrderModal && (
             <motion.div

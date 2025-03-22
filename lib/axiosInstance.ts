@@ -1,19 +1,21 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const API_BASE_URL = "http://localhost:8383"; // 백엔드 서버 주소
 
 const axiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // 쿠키를 서버와 함께 주고받기 위해 추가
 });
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+    const accessToken = Cookies.get("accessToken");
+    if (accessToken) {
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -24,46 +26,48 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    // 401 에러 & 재시도하지 않은 경우만 처리
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
-      // 리프레시 토큰이 없으면 로그인 페이지로 리디렉션
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = Cookies.get("refreshToken");
+
       if (!refreshToken) {
         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-        localStorage.clear();
+        Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
         window.location.href = "/";
         return Promise.reject(error);
       }
-      
+
       try {
-        // 전체 URL을 사용하여 리프레시 토큰 요청
-        const refreshResponse = await axios.post(`/api/auth/refresh`, { 
-          refreshToken 
-        });
-        
-        if (refreshResponse.data?.accessToken) {
-          localStorage.setItem("accessToken", refreshResponse.data.accessToken);
-          if (refreshResponse.data.refreshToken) {
-            localStorage.setItem("refreshToken", refreshResponse.data.refreshToken);
+        const refreshResponse = await axiosInstance.post("/auth/refresh", { refreshToken });
+        if (refreshResponse.data.access_token) {
+          Cookies.set("accessToken", refreshResponse.data.access_token, {
+            expires: 1 / 24, // 1시간 유효
+            secure: true, // HTTPS에서만 전송
+            sameSite: "Strict", // CSRF 방지
+          });
+          if (refreshResponse.data.refresh_token) {
+            Cookies.set("refreshToken", refreshResponse.data.refresh_token, {
+              expires: 7, // 7일 유효
+              secure: true,
+              sameSite: "Strict",
+            });
           }
-          
-          // 인증 헤더 업데이트
-          axios.defaults.headers.common["Authorization"] = `Bearer ${refreshResponse.data.accessToken}`;
-          originalRequest.headers["Authorization"] = `Bearer ${refreshResponse.data.accessToken}`;
-          
-          return axios(originalRequest);
+          axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${refreshResponse.data.access_token}`;
+          originalRequest.headers["Authorization"] = `Bearer ${refreshResponse.data.access_token}`;
+          return axiosInstance(originalRequest);
+        } else {
+          throw new Error("No access_token in refresh response");
         }
       } catch (refreshError) {
-        console.error("토큰 갱신 실패:", refreshError);
         alert("인증이 만료되었습니다. 다시 로그인해주세요.");
-        localStorage.clear();
+        Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
         window.location.href = "/";
+        return Promise.reject(refreshError);
       }
     }
-    
     return Promise.reject(error);
   }
 );

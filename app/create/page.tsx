@@ -1,11 +1,11 @@
-// pages/create.tsx
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "../../lib/axiosInstance";
 import Spinner from "../../components/Spinner";
 import { useFormStore } from "../../store/formStore";
+import { CheckCircle } from "lucide-react";
 
 export default function CreatePage() {
   const router = useRouter();
@@ -23,11 +23,9 @@ export default function CreatePage() {
     setPhoneNumber,
   } = useFormStore();
 
-  // 디바운싱을 위한 타이머 레퍼런스
-  const nameTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const placeTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const pwTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const phoneTimerRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    console.log("Current step:", step);
+  }, [step]);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -49,16 +47,20 @@ export default function CreatePage() {
   // 1) 매장 이름 입력
   // --------------------------------------------
   const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setStoreName(value);
-    if (nameTimerRef.current) clearTimeout(nameTimerRef.current);
-    nameTimerRef.current = setTimeout(() => {
-      console.log("매장 이름 자동저장:", value);
-      if (value.trim() !== "") {
-        setStep(2);
-      }
-    }, 2000);
+    setStoreName(e.target.value);
   };
+
+  // Step 1: 매장 이름 입력
+  const handleNextStep1 = () => {
+    if (storeName.trim() !== "") {
+      setStep(2);
+      console.log("Step moved to 2");
+    } else {
+      alert("매장 이름을 입력해주세요.");
+    }
+  };
+
+
 
   // --------------------------------------------
   // 2) 매장 주소 입력 (카카오 주소 API 사용)
@@ -73,75 +75,72 @@ export default function CreatePage() {
     new (window.daum.Postcode as any)({
       oncomplete: (data: any) => {
         setStorePlace(data.address);
-        console.log("카카오 주소 선택: ", data.address);
-        if (placeTimerRef.current) clearTimeout(placeTimerRef.current);
-        placeTimerRef.current = setTimeout(() => {
-          if (data.address.trim() !== "") {
-            setStep(3);
-          }
-        }, 2000);
       },
     }).open();
   };
 
   const handleChangePlace = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStorePlace(e.target.value);
-    if (placeTimerRef.current) clearTimeout(placeTimerRef.current);
-    placeTimerRef.current = setTimeout(() => {
-      console.log("매장 주소 자동저장: ", e.target.value);
-      if (e.target.value.trim() !== "") {
-        setStep(3);
-      }
-    }, 2000);
+  };
+
+  const handleNextStep2 = () => {
+    if (storePlace.trim() !== "") {
+      setStep(3);
+      console.log("Step moved to 3");
+    } else {
+      alert("매장 주소를 입력해주세요.");
+    }
   };
 
   // --------------------------------------------
-  // 3) 비밀번호(4자리) (Zustand 사용)
+  // 3) 비밀번호(4자리)
   // --------------------------------------------
   const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "").slice(0, 4);
     setPassword(val);
-    if (pwTimerRef.current) clearTimeout(pwTimerRef.current);
-    pwTimerRef.current = setTimeout(() => {
-      console.log("비밀번호 자동저장:", val);
-      if (val.length === 4) {
-        setStep(4); // Move to phone number step
-      }
-    }, 1000);
   };
 
-  const handleChangePhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
-    if (value.length > 11) value = value.slice(0, 11); // Limit to 11 digits
+  const handleNextStep3 = () => {
+    if (password.length === 4) {
+      setStep(4);
+    } else {
+      alert("비밀번호 4자리를 입력해주세요.");
+    }
+  };
 
-    // Format with hyphens (e.g., 010-1234-1234) for display
+  // --------------------------------------------
+  // 4) 전화번호 입력
+  // --------------------------------------------
+  const handleChangePhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 남김
+    if (value.length > 11) value = value.slice(0, 11); // 11자리로 제한
+
+    // 하이픈 형식 적용
     if (value.length <= 3) {
       value = value;
     } else if (value.length <= 7) {
       value = `${value.slice(0, 3)}-${value.slice(3)}`;
     } else {
-      value = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7, 11)}`;
+      value = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7)}`;
     }
 
     setPhoneNumber(value);
-
-    if (phoneTimerRef.current) clearTimeout(phoneTimerRef.current);
-    phoneTimerRef.current = setTimeout(() => {
-      console.log("휴대폰 번호 자동저장:", value);
-      if (value.replace(/-/g, "").length === 11) {
-        submitPayload();
-      }
-    }, 500);
   };
 
-  // submitPayload 함수 수정
+  const handleNextStep4 = () => {
+    if (phoneNumber.replace(/-/g, "").length === 11) {
+      submitPayload();
+    } else {
+      alert("유효한 전화번호(11자리)를 입력해주세요.");
+    }
+  };
+
+  // --------------------------------------------
+  // 최종 제출
+  // --------------------------------------------
   const submitPayload = async () => {
     const { storeName, storePlace, password, phoneNumber } =
       useFormStore.getState();
-
-    console.log("Debug: storeName:", storeName);
-    console.log("Debug: storePlace:", storePlace);
-    console.log("Debug: password:", password);
 
     if (!storeName || !storePlace || password.length !== 4) {
       alert("모든 필드를 올바르게 입력해주세요.");
@@ -158,18 +157,12 @@ export default function CreatePage() {
 
       console.log("최종 payload:", payload);
 
-      // 매장 생성 요청
       const response = await axiosInstance.post("/api/stores", payload);
-
-      // 성공 메시지 표시
       alert("매장이 성공적으로 생성되었습니다. 다시 로그인하여 사용해주세요.");
-
-      // 매장 생성 후 세션 클리어 및 로그인 페이지로 리디렉션
       localStorage.clear();
-
-      setStep(5); // 스피너 단계로 전환
+      setStep(5);
       setTimeout(() => {
-        router.push("/"); // 로그인 페이지로 이동
+        router.push("/");
       }, 2000);
     } catch (error) {
       console.error("매장 생성 실패:", error);
@@ -195,13 +188,23 @@ export default function CreatePage() {
               value={storeName}
               onChange={handleChangeName}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && storeName.trim() !== "") {
-                  setStep(2);
-                }
+                if (e.key === "Enter") handleNextStep1();
               }}
               className="w-[300px] h-10 rounded-md border border-gray-300 px-3 outline-none"
               placeholder="매장 이름을 입력"
             />
+            <button
+              onClick={handleNextStep1}
+              disabled={storeName.trim() === ""}
+              className={`mt-4 flex items-center gap-2 px-4 py-2 text-green-600 transition-all duration-300 ${
+                storeName.trim() === ""
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:text-green-800 hover:scale-110"
+              }`}
+            >
+              <CheckCircle className="w-8 h-8" />
+              
+            </button>
           </div>
         );
       case 2:
@@ -215,18 +218,28 @@ export default function CreatePage() {
               value={storePlace}
               onChange={handleChangePlace}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && storePlace.trim() !== "") {
-                  setStep(3);
-                }
+                if (e.key === "Enter") handleNextStep2();
               }}
               className="w-[300px] h-10 rounded-md border border-gray-300 px-3 outline-none mb-2"
               placeholder="직접 주소를 입력하거나 검색하기"
             />
             <button
               onClick={handleOpenKakaoAddress}
-              className="mt-4 border-none test-xs text-gray-500 rounded-md hover:text-gray-900 transition"
+              className="mt-2 border-none text-xs text-gray-500 rounded-md hover:text-gray-900 transition"
             >
               카카오 주소 검색
+            </button>
+            <button
+              onClick={handleNextStep2}
+              disabled={storePlace.trim() === ""}
+              className={`mt-4 flex items-center gap-2 px-4 py-2 text-green-600 transition-all duration-300 ${
+                storePlace.trim() === ""
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:text-green-800 hover:scale-110"
+              }`}
+            >
+              <CheckCircle className="w-8 h-8" />
+              
             </button>
           </div>
         );
@@ -242,13 +255,23 @@ export default function CreatePage() {
               value={password}
               onChange={handleChangePassword}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && password.length === 4) {
-                  setStep(4);
-                }
+                if (e.key === "Enter") handleNextStep3();
               }}
               className="w-[300px] h-10 rounded-md border border-gray-300 px-3 outline-none text-center"
               placeholder=""
             />
+            <button
+              onClick={handleNextStep3}
+              disabled={password.length !== 4}
+              className={`mt-4 flex items-center gap-2 px-4 py-2 text-green-600 transition-all duration-300 ${
+                password.length !== 4
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:text-green-800 hover:scale-110"
+              }`}
+            >
+              <CheckCircle className="w-8 h-8" />
+              
+            </button>
           </div>
         );
       case 4:
@@ -262,16 +285,23 @@ export default function CreatePage() {
               value={phoneNumber}
               onChange={handleChangePhoneNumber}
               onKeyDown={(e) => {
-                if (
-                  e.key === "Enter" &&
-                  phoneNumber.replace(/-/g, "").length === 11
-                ) {
-                  submitPayload();
-                }
+                if (e.key === "Enter") handleNextStep4();
               }}
               className="w-[300px] h-10 rounded-md border border-gray-300 px-3 outline-none"
               placeholder="010-1234-1234"
             />
+            <button
+              onClick={handleNextStep4}
+              disabled={phoneNumber.replace(/-/g, "").length !== 11}
+              className={`mt-4 flex items-center gap-2 px-4 py-2 text-green-600 transition-all duration-300 ${
+                phoneNumber.replace(/-/g, "").length !== 11
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:text-green-800 hover:scale-110"
+              }`}
+            >
+              <CheckCircle className="w-8 h-8" />
+              
+            </button>
           </div>
         );
       default:

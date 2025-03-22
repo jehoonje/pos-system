@@ -8,7 +8,7 @@ import {
   getDay,
   addMonths,
   subMonths,
-  isSameDay, // 오늘 날짜 비교를 위해 추가
+  isSameDay,
 } from "date-fns";
 import { OrderSummary } from "../types/order";
 
@@ -22,7 +22,7 @@ interface MonthlyCalendarProps {
 interface CalendarDay {
   day: number;
   sales: number;
-  date: Date; // 날짜 비교를 위해 Date 객체 추가
+  date: Date;
 }
 
 const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
@@ -37,24 +37,34 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   const [cellSize, setCellSize] = useState<number>(70);
 
   useEffect(() => {
+    if (!orderSummaries || orderSummaries.length === 0) {
+      setMonthlyData({});
+      setTotalMonthlySales(0);
+      return;
+    }
+  
     const start = startOfMonth(currentMonth);
     const end = endOfMonth(currentMonth);
     const daysInMonth = eachDayOfInterval({ start, end });
-
+  
     const data: Record<string, number> = {};
     let total = 0;
-
+  
+    const successSummaries = orderSummaries.filter(
+      (summary) => !summary.status || summary.status === "success"
+    );
+  
     daysInMonth.forEach((day) => {
       const dateStr = format(day, "yyyy-MM-dd");
-      const summary = orderSummaries.find((s) => s.date === dateStr);
+      const summary = successSummaries.find((s) => s.date === dateStr);
       const dailyTotal = summary ? summary.totalPrice : 0;
       data[dateStr] = dailyTotal;
       total += dailyTotal;
     });
-
+  
     setMonthlyData(data);
     setTotalMonthlySales(total);
-
+  
     const updateCellSize = () => {
       if (calendarRef.current && calendarRef.current.parentElement) {
         const parentWidth = calendarRef.current.parentElement.clientWidth;
@@ -65,7 +75,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         setCellSize(Math.max(40, newCellSize));
       }
     };
-
+  
     updateCellSize();
     window.addEventListener("resize", updateCellSize);
     return () => window.removeEventListener("resize", updateCellSize);
@@ -79,7 +89,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     setCurrentMonth(addMonths(currentMonth, 1));
   };
 
-  const today = new Date(); // 오늘 날짜 가져오기
+  const today = new Date();
   const start = startOfMonth(currentMonth);
   const end = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start, end });
@@ -94,7 +104,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     calendarGrid.push({
       day: day.getDate(),
       sales: monthlyData[dateStr] || 0,
-      date: day, // 날짜 객체 추가
+      date: day,
     });
   });
   while (calendarGrid.length % 7 !== 0) {
@@ -107,6 +117,14 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   }
 
   const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+
+  if (!orderSummaries || orderSummaries.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p>해당 월의 매출 내역이 없습니다.</p>
+      </div>
+    );
+  }
 
   return (
     <div

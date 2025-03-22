@@ -56,7 +56,7 @@ interface PosState {
 
   // 카테고리 목록 & 캐싱
   categories: Category[];
-  menuCache: Record<number, Menu[]>; // <카테고리ID, 메뉴목록> 캐싱
+  menuCache: { [storeId: number]: { [categoryId: number]: Menu[] } }; // <카테고리ID, 메뉴목록> 캐싱
   currentMenus: Menu[]; // 화면에 표시되는 메뉴
 
   selectedItems: SelectedItem[];
@@ -73,10 +73,7 @@ interface PosState {
   setSelectedItems: (items: SelectedItem[]) => void;
   fetchCategories: (storeId: number) => Promise<void>;
   fetchUnpaidOrderByPlace: (placeId: number) => Promise<void>;
-  fetchMenusByCategory: (
-    categoryId: number,
-    forceReload?: boolean
-  ) => Promise<void>;
+  fetchMenusByCategory: (categoryId: number, forceReload?: boolean) => Promise<void>;
 
   // 캐시 무효화 액션
   invalidateMenuCache: (categoryId: number) => void;
@@ -115,7 +112,18 @@ export const usePosStore = create<PosState>((set, get) => ({
   selectedItems: [],
   isLoading: false,
 
-  setStoreId: (id) => set({ storeId: id }), // 매장 ID 설정
+  setStoreId: (id) => {
+    // 스토어 변경 시 관련 상태 초기화
+    set({
+      storeId: id,
+      categories: [],
+      currentMenus: [],
+      selectedItems: [],
+      tableName: null,
+      placeId: null,
+      orderId: null,
+    });
+  },
   setTableName: (name) => set({ tableName: name }), // 테이블 이름 설정
 
   setPlaceId: (id) => set({ placeId: id }), // 장소 ID 설정
@@ -125,81 +133,53 @@ export const usePosStore = create<PosState>((set, get) => ({
   setSelectedItems: (items) => set({ selectedItems: items }), // 선택된 아이템 설정
 
   fetchCategories: async (storeId: number) => {
-    // 카테고리 목록을 비동기적으로 가져옴
-    set({ isLoading: true });
     try {
-      const { data } = await axiosInstance.get(
-        `/api/categories/all/${storeId}`
-      );
-      set({ categories: data, isLoading: false });
-    } catch (err) {
-      console.error("fetchCategories 오류:", err);
-      set({
-        categories: [{ categoryId: -1, categoryName: "unconnected" }],
-        isLoading: false,
-      });
+      console.log(`Fetching categories from API for storeId: ${storeId}`);
+      const response = await axiosInstance.get(`/api/categories/all/${storeId}`);
+      console.log(`API response for /api/categories/all/${storeId}:`, response.data);
+      set({ categories: response.data });
+    } catch (error) {
+      console.error(`fetchCategories error for storeId: ${storeId}:`, error);
+      set({ categories: [] });
     }
   },
 
-  fetchMenusByCategory: async (
-    categoryId: number,
-    forceReload: boolean = false
-  ) => {
-    // 카테고리별 메뉴를 비동기적으로 가져옴
+  fetchMenusByCategory: async (categoryId: number, forceReload: boolean = false) => {
+    const { storeId, menuCache } = get();
+    if (!storeId) return;
+
     set({ isLoading: true });
-    const { menuCache } = get();
-    console.debug(
-      "[fetchMenusByCategory] categoryId:",
-      categoryId,
-      "forceReload:",
-      forceReload
-    );
-    if (!forceReload && menuCache[categoryId]) {
-      console.debug("[fetchMenusByCategory] 캐시 사용:", menuCache[categoryId]);
-      set({ currentMenus: menuCache[categoryId], isLoading: false });
+    const storeCache = menuCache[storeId] || {};
+    if (!forceReload && storeCache[categoryId]) {
+      console.log(`Using cached menus for storeId: ${storeId}, categoryId: ${categoryId}`);
+      set({ currentMenus: storeCache[categoryId], isLoading: false });
       return;
     }
     try {
-      const { data } = await axiosInstance.get(`/api/menus/all/${categoryId}`);
-      console.debug("[fetchMenusByCategory] API 응답 데이터:", data);
-      // API 응답에서 menuId가 없으면 menu.id를 대신 사용하도록 변환
-      const transformed = data.map((menu: any) => {
-        const finalId = menu.menuId ?? menu.id ?? null;
-        console.debug(
-          `[fetchMenusByCategory] menuName=${menu.menuName}, menu.menuId=${menu.menuId}, menu.id=${menu.id}, 최종 menuId=${finalId}`
-        );
-        return {
-          ...menu,
-          menuId: finalId,
-        };
+      console.log(`Fetching menus from API for storeId: ${storeId}, categoryId: ${categoryId}`);
+      const { data } = await axiosInstance.get(`/api/menus/all/${categoryId}`, {
+        params: { storeId }, // storeId를 쿼리 파라미터로 추가
       });
-      console.debug("[fetchMenusByCategory] 변환된 데이터:", transformed);
+      console.log(`API response for /api/menus/all/${categoryId}?storeId=${storeId}:`, data);
+      const transformed = data.map((menu: any) => ({
+        ...menu,
+        menuId: menu.menuId ?? menu.id ?? null,
+      }));
       set((state) => ({
-        menuCache: { ...state.menuCache, [categoryId]: transformed },
+        menuCache: {
+          ...state.menuCache,
+          [storeId]: {
+            ...(state.menuCache[storeId] || {}),
+            [categoryId]: transformed,
+          },
+        },
         currentMenus: transformed,
         isLoading: false,
       }));
     } catch (err) {
-      console.error("fetchMenusByCategory 오류:", err);
+      console.error(`fetchMenusByCategory error for categoryId: ${categoryId}, storeId: ${storeId}:`, err);
       set({
-        currentMenus: [
-          {
-            menuId: -1,
-            uiId: 0,
-            categoryId: -1,
-            menuName: "unconnected",
-            discountRate: 0,
-            price: 0,
-            createdAt: "",
-            menuStyle: {
-              uiId: 0,
-              positionX: 0,
-              positionY: 0,
-              colorCode: "#aaa",
-              sizeType: "FULL",
-            },
-          },
-        ],
+        currentMenus: [],
         isLoading: false,
       });
     }
@@ -209,24 +189,23 @@ export const usePosStore = create<PosState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { data } = await axiosInstance.get(`/api/orders/places/${placeId}`);
-      if (data && data.orderStatus === "UNPAID") {
-        const allMenus = Object.values(get().menuCache).flat(); // 모든 카테고리의 메뉴를 평탄화
+      const { storeId, menuCache } = get();
+      if (data && data.orderStatus === "UNPAID" && storeId) {
+        const storeMenus = menuCache[storeId] || {};
+        const allMenus = Object.values(storeMenus).flat(); // 현재 storeId의 메뉴만 평탄화
         const selectedItems = data.menuDetail.map((menu: any) => {
           const cachedMenu = allMenus.find((m) => m.menuName === menu.menuName);
           if (!cachedMenu) {
-            console.warn(
-              `[fetchUnpaidOrderByPlace] menuCache에서 ${menu.menuName}의 menuId를 찾을 수 없습니다.`
-            );
+            console.warn(`[fetchUnpaidOrderByPlace] ${menu.menuName}의 menuId를 찾을 수 없습니다.`);
           }
           return {
             menuName: menu.menuName,
             price: menu.totalPrice / menu.totalCount,
             quantity: menu.totalCount,
-            menuId: cachedMenu ? cachedMenu.menuId : null, // menuCache에서 menuId 매핑
-            orderMenuId: menu.id || null, // orderMenuId가 있다면 사용 (삭제용)
+            menuId: cachedMenu ? cachedMenu.menuId : -1, // 기본값으로 -1 사용
+            orderMenuId: menu.id || null,
           };
         });
-        console.debug("[fetchUnpaidOrderByPlace] 선택된 메뉴:", selectedItems);
         set({
           orderId: data.orderId,
           selectedItems,
@@ -236,29 +215,14 @@ export const usePosStore = create<PosState>((set, get) => ({
           isLoading: false,
         });
       } else {
-        set({
-          orderId: null,
-          selectedItems: [],
-          placeId,
-          isLoading: false,
-        });
+        set({ orderId: null, selectedItems: [], placeId, isLoading: false });
       }
     } catch (err: any) {
       if (err.response?.status === 404) {
-        set({
-          orderId: null,
-          selectedItems: [], // 404 오류 시 명시적 초기화
-          placeId,
-          isLoading: false,
-        });
+        set({ orderId: null, selectedItems: [], placeId, isLoading: false });
       } else {
         console.error("fetchUnpaidOrderByPlace 오류:", err);
-        set({
-          orderId: null,
-          selectedItems: [],
-          placeId,
-          isLoading: false,
-        });
+        set({ orderId: null, selectedItems: [], placeId, isLoading: false });
       }
     }
   },
@@ -313,14 +277,10 @@ export const usePosStore = create<PosState>((set, get) => ({
   resetData: () => {
     // 모든 데이터 초기화
     set({
-      tableName: null,
-      placeId: null,
-      orderId: null,
-      categories: [],
-      menuCache: {},
-      currentMenus: [],
       selectedItems: [],
-      isLoading: false,
+      orderId: null,
+      placeId: null,
+      tableName: "",
     });
   },
 }));
