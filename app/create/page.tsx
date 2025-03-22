@@ -29,7 +29,7 @@ export default function CreatePage() {
   }, [step]);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = Cookies.get("accessToken");
     if (!token) {
       alert("세션이 만료되었습니다. 다시 로그인해주세요.");
       router.push("/");

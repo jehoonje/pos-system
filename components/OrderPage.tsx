@@ -15,6 +15,7 @@ import MonthlyCalendar from "@/components/MonthlyCalendar";
 import CalculatorModal from "./CalculatorModal";
 import { Order, OrderSummary } from "../types/order";
 import { Receipt } from "../types/receipt";
+import Cookies from "js-cookie";
 import _ from "lodash";
 
 const queryClient = new QueryClient();
@@ -46,7 +47,7 @@ export default function OrderPage() {
 
   // `window` 참조를 useEffect 내부로 이동
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+    const token = typeof window !== "undefined" ? Cookies.get("authToken") : null;
     if (token) {
       axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }

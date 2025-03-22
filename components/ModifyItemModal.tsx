@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HexColorPicker } from "react-colorful";
 import axiosInstance from "../lib/axiosInstance";
+import Cookies from "js-cookie";
 
 type MenuItem = {
   menuId: number;
@@ -43,7 +44,7 @@ export default function ModifyItemModal({
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
+    const storedToken = Cookies.get("accessToken");
     if (storedToken) setToken(storedToken);
   }, []);
 

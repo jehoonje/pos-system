@@ -5,6 +5,7 @@ import AddCategoryModal from "../../components/AddCategoryModal";
 import ModifyCategoryModal from "../../components/ModifyCategoryModal";
 import axiosInstance from "../../lib/axiosInstance";
 import { ChevronLeft } from "lucide-react";
+import Cookies from "js-cookie";
 
 export default function EditCategoryPage() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function EditCategoryPage() {
 
   // 토큰 가져오기
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
+    const storedToken = Cookies.get("accessToken");
     if (!storedToken) {
       alert("세션이 만료되었습니다. 다시 로그인해주세요.");
       router.push("/");

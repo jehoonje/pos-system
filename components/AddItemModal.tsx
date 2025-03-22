@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HexColorPicker } from "react-colorful";
 import axiosInstance from "../lib/axiosInstance";
+import Cookies from "js-cookie";
 
 interface Props {
   onClose: () => void;
@@ -31,7 +32,7 @@ export default function AddItemModal({
   const colorPickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
+    const storedToken = Cookies.get("accessToken");
     if (storedToken) setToken(storedToken);
   }, []);
 

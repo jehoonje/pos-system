@@ -72,7 +72,7 @@ export default function EditMenuPage() {
   const [hasHalfInSameCell, setHasHalfInSameCell] = useState(false);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
+    const storedToken = Cookies.get("accessToken");
     if (!storedToken) {
       alert("세션이 만료되었습니다. 다시 로그인해주세요.");
       router.push("/");
