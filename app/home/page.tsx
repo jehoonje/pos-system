@@ -181,11 +181,28 @@ export default function HomePage() {
   const handleStartBusiness = async () => {
     if (!selectedStore) return;
     try {
+      const accessToken = Cookies.get("accessToken");
+      if (!accessToken) {
+        showAlert("세션이 만료되었습니다. 다시 로그인해주세요.", "warning");
+        handleLogout();
+        return;
+      }
       await axiosInstance.post(`/api/times/open/${selectedStore.storeId}`);
       setShowStartModal(false);
       router.push("/pos");
     } catch (error) {
-      showAlert("매장 오픈 중 오류가 발생했습니다.", "error");
+      if ((error as AxiosError)?.response?.status === 401) {
+        await handleTokenRefresh();
+        try {
+          await axiosInstance.post(`/api/times/open/${selectedStore.storeId}`);
+          setShowStartModal(false);
+          router.push("/pos");
+        } catch (retryError) {
+          showAlert("매장 오픈 중 오류가 발생했습니다.", "error");
+        }
+      } else {
+        showAlert("매장 오픈 중 오류가 발생했습니다.", "error");
+      }
     }
   };
 

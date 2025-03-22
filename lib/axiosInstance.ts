@@ -34,6 +34,7 @@ axiosInstance.interceptors.response.use(
       if (!refreshToken) {
         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
         Cookies.remove("accessToken");
+        Cookies.remove("access_token");
         Cookies.remove("refreshToken");
         window.location.href = "/";
         return Promise.reject(error);
@@ -63,6 +64,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         alert("인증이 만료되었습니다. 다시 로그인해주세요.");
         Cookies.remove("accessToken");
+        Cookies.remove("access_token");
         Cookies.remove("refreshToken");
         window.location.href = "/";
         return Promise.reject(refreshError);

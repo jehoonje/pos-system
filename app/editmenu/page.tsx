@@ -8,6 +8,7 @@ import AddItemModal from "../../components/AddItemModal";
 import ModifyItemModal from "../../components/ModifyItemModal";
 import GridCell from "../../components/EditGridCell";
 import { ChevronLeft } from "lucide-react";
+import Cookies from "js-cookie";
 
 // react-dnd 관련
 import { DndProvider } from "react-dnd";
@@ -79,7 +80,7 @@ export default function EditMenuPage() {
     }
     setToken(storedToken);
 
-    const savedStoreId = localStorage.getItem("currentStoreId");
+    const savedStoreId = Cookies.get("currentStoreId");
     if (!savedStoreId) {
       alert("Store ID가 없습니다. 다시 로그인해주세요.");
       router.push("/");

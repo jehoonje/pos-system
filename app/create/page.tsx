@@ -6,6 +6,7 @@ import axiosInstance from "../../lib/axiosInstance";
 import Spinner from "../../components/Spinner";
 import { useFormStore } from "../../store/formStore";
 import { CheckCircle } from "lucide-react";
+import Cookies from "js-cookie";
 
 export default function CreatePage() {
   const router = useRouter();
@@ -139,14 +140,13 @@ export default function CreatePage() {
   // 최종 제출
   // --------------------------------------------
   const submitPayload = async () => {
-    const { storeName, storePlace, password, phoneNumber } =
-      useFormStore.getState();
-
+    const { storeName, storePlace, password, phoneNumber } = useFormStore.getState();
+  
     if (!storeName || !storePlace || password.length !== 4) {
       alert("모든 필드를 올바르게 입력해주세요.");
       return;
     }
-
+  
     try {
       const payload = {
         storeName,
@@ -154,12 +154,14 @@ export default function CreatePage() {
         password,
         phoneNumber: phoneNumber.replace(/-/g, ""),
       };
-
+  
       console.log("최종 payload:", payload);
-
+  
       const response = await axiosInstance.post("/api/stores", payload);
       alert("매장이 성공적으로 생성되었습니다. 다시 로그인하여 사용해주세요.");
-      localStorage.clear();
+      Cookies.remove("accessToken");
+      Cookies.remove("refreshToken");
+      Cookies.remove("currentStoreId");
       setStep(5);
       setTimeout(() => {
         router.push("/");
