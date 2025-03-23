@@ -41,22 +41,28 @@ axiosInstance.interceptors.response.use(
       }
 
       try {
-        const refreshResponse = await axiosInstance.post("/auth/refresh", { refreshToken });
+        const refreshResponse = await axiosInstance.post("/auth/refresh", {
+          refreshToken,
+        });
         if (refreshResponse.data.access_token) {
           Cookies.set("accessToken", refreshResponse.data.access_token, {
-            expires: 1 / 24, // 1시간 유효
-            secure: true, // HTTPS에서만 전송
-            sameSite: "Strict", // CSRF 방지
+            expires: 1 / 24,
+            secure: window.location.protocol === "https:", // 환경에 따라 유연하게
+            sameSite: "Lax",
           });
           if (refreshResponse.data.refresh_token) {
             Cookies.set("refreshToken", refreshResponse.data.refresh_token, {
-              expires: 7, // 7일 유효
-              secure: true,
-              sameSite: "Strict",
+              expires: 7,
+              secure: window.location.protocol === "https:",
+              sameSite: "Lax",
             });
           }
-          axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${refreshResponse.data.access_token}`;
-          originalRequest.headers["Authorization"] = `Bearer ${refreshResponse.data.access_token}`;
+          axiosInstance.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${refreshResponse.data.access_token}`;
+          originalRequest.headers[
+            "Authorization"
+          ] = `Bearer ${refreshResponse.data.access_token}`;
           return axiosInstance(originalRequest);
         } else {
           throw new Error("No access_token in refresh response");
