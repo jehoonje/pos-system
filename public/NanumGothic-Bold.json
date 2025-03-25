@@ -1,0 +1,31 @@
+{
+  "glyphs": {},
+  "familyName": "NanumGothic",
+  "ascender": 1278,
+  "descender": -319,
+  "underlinePosition": -361,
+  "underlineThickness": 81,
+  "boundingBox": { "yMin": -287, "xMin": -17, "yMax": 1124, "xMax": 1418 },
+  "resolution": 1000,
+  "original_font_information": {
+    "format": 0,
+    "copyright": "Copyright © 2011 NHN Corporation. All rights reserved. Font designed by Sandoll Communications Inc.",
+    "fontFamily": "NanumGothic",
+    "fontSubfamily": "Bold",
+    "uniqueID": "3.021;SAND;NanumGothicBold;161024_01;",
+    "fullName": "NanumGothicBold",
+    "version": "Version 3.021;PS 1;hotconv 1.0.57;makeotf.lib2.0.21895",
+    "postScriptName": "NanumGothicBold",
+    "trademark": "NanumGothicBold is a registered trademark of NHN Corporation.",
+    "manufacturer": "NHN Corporation",
+    "designer": "Bruce Kwon; Nicolas Noh; Sung-woo Choi;",
+    "manufacturerURL": "http://www.nhncorp.com",
+    "designerURL": "http://www.sandoll.co.kr",
+    "licence": "NHN Corporation",
+    "licenceURL": "http://www.nhncorp.com",
+    "preferredFamily": "NanumGothic",
+    "preferredSubfamily": "Bold"
+  },
+  "cssFontWeight": "bold",
+  "cssFontStyle": "normal"
+}

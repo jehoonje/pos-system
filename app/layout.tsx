@@ -16,7 +16,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   const pathname = usePathname();
 
   return (
-    <html lang="en">
+    <html lang="kr">
       <head>
         <script
           defer

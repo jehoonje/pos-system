@@ -81,22 +81,30 @@ export default function HomePage() {
     }
   };
 
-  useEffect(() => {
-    const initialize = async () => {
+  // HomePage.js 수정
+useEffect(() => {
+  const initialize = async () => {
+    try {
       const accessToken = Cookies.get("accessToken");
-      const refreshToken = Cookies.get("refreshToken");
-
-      if (!accessToken && !refreshToken) {
-        showAlert("세션이 만료되었습니다. 다시 로그인해주세요.", "warning");
-        handleLogout();
-      } else if (!accessToken && refreshToken) {
-        await handleTokenRefresh();
-      } else {
-        await refetchStores();
+      console.log("홈 페이지 접근, 토큰 확인:", !!accessToken);
+      
+      if (!accessToken) {
+        console.log("토큰 없음, 로그인 페이지로 이동");
+        router.push("/");
+        return;
       }
-    };
-    initialize();
-  }, []);
+      
+      // 토큰이 있으면 스토어 정보 가져오기
+      await refetchStores();
+    } catch (error) {
+      console.error("초기화 오류:", error);
+      showAlert("오류가 발생했습니다.", "error");
+    }
+  };
+  
+  initialize();
+}, []);
+
 
   const handleLogout = async () => {
     try {

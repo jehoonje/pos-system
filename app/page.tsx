@@ -18,6 +18,7 @@ export default function LoginPage() {
     }
   }, [router]);
 
+  // LoginPage.js 수정
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -28,37 +29,39 @@ export default function LoginPage() {
         password,
       });
 
+      console.log("로그인 응답:", response.data);
+
       const { access_token, refresh_token } = response.data;
 
       if (access_token && refresh_token) {
+        // 토큰 저장
         Cookies.set("accessToken", access_token, {
-          expires: 1 / 24, // 1시간
-          secure: true,
-          sameSite: "Strict",
+          expires: 1 / 24,
+          secure: window.location.protocol === "https:",
+          sameSite: "Lax",
         });
+
         Cookies.set("refreshToken", refresh_token, {
-          expires: 7, // 7일
-          secure: true,
-          sameSite: "Strict",
+          expires: 7,
+          secure: window.location.protocol === "https:",
+          sameSite: "Lax",
         });
 
-        if (autoLogin) {
-          Cookies.set("autoLogin", "true", {
-            expires: 7,
-            secure: true,
-            sameSite: "Strict",
-          });
-        } else {
-          Cookies.remove("autoLogin");
-        }
+        // 중요: 토큰 저장 후 페이지 새로고침 없이 상태 업데이트
+        console.log("토큰 저장 완료, 홈으로 이동");
 
-        setTimeout(() => {
-          window.location.href = "/home";
-        }, 100);
+        // 방법 1: Next.js Router 사용 (권장)
+        router.push("/home");
+
+        // 방법 2: 필요시 강제 새로고침 (마지막 수단)
+        // setTimeout(() => {
+        //   window.location.href = "/home";
+        // }, 100);
       } else {
         setErrorMsg("토큰이 응답에 포함되지 않았습니다.");
       }
     } catch (error: any) {
+      console.error("로그인 오류:", error);
       setErrorMsg(
         error.response?.data?.message ||
           "로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요."
@@ -92,6 +95,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password" 
           />
         </div>
         <div className="mb-4 flex items-center">
