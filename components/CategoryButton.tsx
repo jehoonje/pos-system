@@ -6,6 +6,7 @@ interface CategoryButtonProps {
   selected?: boolean;
   onClick?: () => void;
   style?: React.CSSProperties;
+  isDarkMode?: boolean; 
 }
 
 // 색상의 상대적 밝기(Luminance)를 계산하는 함수

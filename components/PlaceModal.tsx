@@ -15,6 +15,7 @@ interface Place {
 }
 
 interface PlaceModalProps {
+  isDarkMode?: boolean; 
   onClose: () => void;
   onPlaceSelected: (
     placeName: string,

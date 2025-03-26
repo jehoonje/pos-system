@@ -10,11 +10,15 @@ import useAlertModal from "@/hooks/useAlertModal";
 
 interface SwipeableItemProps {
   item: SelectedItem;
+  isDarkMode?: boolean; 
   onDelete: () => void;
 }
 
-function SwipeableItem({ item, onDelete }: SwipeableItemProps) {
-  // 기존 SwipeableItem 코드 유지
+interface SelectedMenuListProps {
+  isDarkMode?: boolean; // Optional prop 추가
+}
+
+function SwipeableItem({ item, onDelete, isDarkMode = false }: SwipeableItemProps) {
   const [translateX, setTranslateX] = useState(0);
   const [startX, setStartX] = useState<number | null>(null);
   const [isSwiped, setIsSwiped] = useState(false);
@@ -51,20 +55,22 @@ function SwipeableItem({ item, onDelete }: SwipeableItemProps) {
   };
 
   return (
-    <div className="relative w-full border-b overflow-hidden">
+    <div className={`relative w-full border-b overflow-hidden ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}>
       <button
-        className={`absolute top-0 right-0 h-full w-16 flex items-center justify-center bg-red-500 text-white transition-all border-l border-gray-300 border-b ${
+        className={`absolute top-0 right-0 h-full w-16 flex items-center justify-center bg-red-500 text-white transition-all border-l ${
           !item.menuId ? "opacity-50 cursor-not-allowed" : ""
-        } ${isSwiped ? "translate-x-0" : "translate-x-full"}`}
+        } ${isSwiped ? "translate-x-0" : "translate-x-full"} ${
+          isDarkMode ? 'border-gray-700' : 'border-gray-300 border-b'
+        }`}
         onClick={handleDelete}
         disabled={!item.menuId}
       >
         <Trash2 className="w-5 h-5" />
       </button>
       <div
-        className={`flex items-center justify-between p-5 text-lg bg-white transition-transform duration-200 ${
+        className={`flex items-center justify-between p-5 text-lg transition-transform duration-200 ${
           dragging ? "cursor-grabbing" : "cursor-pointer"
-        }`}
+        } ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'}`}
         style={{ transform: `translateX(${translateX}px)` }}
         onTouchStart={(e) => handleStart(e.touches[0].clientX)}
         onTouchMove={(e) => handleMove(e.touches[0].clientX)}
@@ -86,7 +92,7 @@ function SwipeableItem({ item, onDelete }: SwipeableItemProps) {
   );
 }
 
-export default function SelectedMenuList() {
+export default function SelectedMenuList({ isDarkMode = false }: SelectedMenuListProps) {
   const router = useRouter();
   const {
     storeId,
@@ -442,8 +448,8 @@ export default function SelectedMenuList() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
-      <h1 className="font-mono text-gray-700 py-4 text-lg text-center border-b-2 border-gray-300">
+    <div className={`flex flex-col h-full w-full ${isDarkMode ? 'bg-gray-800 text-white' : ''}`}>
+      <h1 className={`font-mono py-4 text-lg text-center border-b-2 ${isDarkMode ? 'border-gray-700 text-white' : 'text-gray-700 border-gray-300'}`}>
         Selected Menu
       </h1>
       <div className="flex-1 overflow-auto">
@@ -452,10 +458,11 @@ export default function SelectedMenuList() {
             key={idx}
             item={item}
             onDelete={() => handleMenuDelete(item)}
+            isDarkMode={isDarkMode}
           />
         ))}
       </div>
-      <div className="mt-4 border-t-2 text-gray-700 font-bold p-4 pt-2 flex flex-col space-y-2">
+      <div className={`mt-4 border-t-2 font-bold p-4 pt-2 flex flex-col space-y-2 ${isDarkMode ? 'border-gray-700 text-white' : 'border-gray-300 text-gray-700'}`}>
         <div className="flex p-2 px-4 justify-between">
           <span>Total :</span>
           <span>₩ {totalPrice.toLocaleString()}</span>
@@ -463,13 +470,21 @@ export default function SelectedMenuList() {
         <div className="flex space-x-2 pb-4 gap-2">
           <button
             onClick={handleOrderClick}
-            className="flex-1 py-4 bg-blue-500 hover:bg-blue-600 text-white transition rounded-md text-sm"
+            className={`flex-1 py-4 text-white transition rounded-md text-sm ${
+              isDarkMode 
+                ? 'bg-blue-600 hover:bg-blue-700' 
+                : 'bg-blue-500 hover:bg-blue-600'
+            }`}
           >
             Order
           </button>
           <button
             onClick={handlePaymentClick}
-            className="flex-1 py-4 bg-gray-200 hover:bg-gray-300 transition rounded-md text-sm"
+            className={`flex-1 py-4 transition rounded-md text-sm ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+            }`}
           >
             Pay
           </button>

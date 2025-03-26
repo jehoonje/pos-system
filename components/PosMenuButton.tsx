@@ -7,6 +7,7 @@ interface Props {
   onClick?: () => void;
   color?: string; // 서버에서 받아온 색상 or #f5f5f5
   sizeType?: "FULL" | "HALF"; // 버튼 크기 타입
+  isDarkMode?: boolean; // Add dark mode prop
 }
 
 // 색상의 상대적 밝기(Luminance)를 계산하는 함수
@@ -37,6 +38,7 @@ export default function MenuButton({
   onClick,
   color = "#f5f5f5",
   sizeType = "FULL",
+  isDarkMode = false,
 }: Props) {
   // sizeType에 따라 width/height 등 다르게 처리 가능
   const baseStyle =
@@ -44,7 +46,9 @@ export default function MenuButton({
       ? "w-full h-full " // 가로세로 모두 차지 (그리드 셀 크기에 따라)
       : "w-full h-[50%]"; // 예시: 반만 차지
 
-  const textColor = getTextColor(color);
+  // Apply default color based on dark mode if no specific color is provided
+  const finalColor = color === "#f5f5f5" && isDarkMode ? "#333333" : color;
+  const textColor = getTextColor(finalColor);
 
   return (
     <button
@@ -52,7 +56,7 @@ export default function MenuButton({
       className={`${baseStyle} font-medium font-mono
                   flex items-center justify-center
                   hover:opacity-50 hover:shadow-lg transition-all duration-200`}
-      style={{ backgroundColor: color, color: textColor }} // 동적 글씨 색상 적용
+      style={{ backgroundColor: finalColor, color: textColor }} // 동적 글씨 색상 적용
     >
       <div className="text-center">
         <div>{menuName}</div>

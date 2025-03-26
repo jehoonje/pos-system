@@ -6,15 +6,16 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const { pathname } = url;
+
+  // 쿠키 확인 로직 개선 - 모든 쿠키 출력하여 디버깅
+  console.log("미들웨어 쿠키 확인:", request.cookies.getAll());
   
-  // 인증 쿠키 확인 - 여러 가능한 토큰 이름 확인
+  
   const accessToken = request.cookies.get('accessToken')?.value;
   const authToken = request.cookies.get('auth_token')?.value;
-  
-  // 둘 중 하나라도 있으면 인증된 것으로 간주
   const isAuthenticated = !!(accessToken || authToken);
   
-  console.log(`미들웨어: 경로=${pathname}, 인증=${isAuthenticated}`);
+  console.log(`미들웨어: 경로=${pathname}, 인증=${isAuthenticated}, 토큰 존재=${!!accessToken}`);
   
   // 디버깅 정보를 응답 헤더에 추가 (개발 환경에서만)
   const response = NextResponse.next();
@@ -30,7 +31,7 @@ export function middleware(request: NextRequest) {
   if (
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/api/") ||
-    pathname.match(/\.(jpg|jpeg|png|gif|svg|ico|css|js)$/)
+    pathname.match(/\.(jpg|jpeg|png|gif|svg|ico|css|js|glb|gltf)$/)
   ) {
     return NextResponse.next();
   }
