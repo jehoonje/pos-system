@@ -17,14 +17,15 @@ import { Order, OrderSummary } from "../types/order";
 import { Receipt } from "../types/receipt";
 import Cookies from "js-cookie";
 import _ from "lodash";
+import { useThemeStore } from "@/store/themeStore";
 
 const queryClient = new QueryClient();
 
 export default function OrderPage() {
-
   const router = useRouter();
   const { storeId, selectedOrderId, selectedDate, setSelectedOrder, setCalculatorModalOpen } =
     useFormStore();
+  const { isDarkMode } = useThemeStore();
 
   const [placeName, setPlaceName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +45,17 @@ export default function OrderPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [isDataReady, setIsDataReady] = useState(false);
+
+  // 다크모드 배경색 적용
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (isDarkMode) {
+        document.body.style.backgroundColor = "#111827";
+      } else {
+        document.body.style.backgroundColor = "";
+      }
+    }
+  }, [isDarkMode]);
 
   // `window` 참조를 useEffect 내부로 이동
   useEffect(() => {
@@ -407,14 +419,15 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="flex items-center font-mono justify-center h-screen w-screen relative">
-      <div className="relative w-4/5 h-4/5 bg-white bg-opacity-20 border border-gray-400 rounded-2xl flex overflow-hidden">
+    <div className={`flex items-center font-mono justify-center h-screen w-screen relative ${isDarkMode ? 'bg-gray-900' : ''}`}>
+      <div className={`relative w-4/5 h-4/5 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} rounded-2xl flex overflow-hidden`}>
         {isMonthly && storeId ? (
           <MonthlyCalendar
             orderSummaries={orderSummaries || []}
             currentMonth={currentMonth}
             setCurrentMonth={setCurrentMonth}
             storeId={storeId}
+            isDarkMode={isDarkMode}
           />
         ) : (
           <>
@@ -438,6 +451,7 @@ export default function OrderPage() {
                 handleSearch={handleSearch}
                 isLoadingData={isLoadingData}
                 isDataReady={isDataReady}
+                isDarkMode={isDarkMode}
               />
               <OrderDetails
                 placeName={placeName}
@@ -446,12 +460,13 @@ export default function OrderPage() {
                 order={order}
                 handlePrint={handlePrint}
                 setIsRefundModalOpen={setIsRefundModalOpen}
+                isDarkMode={isDarkMode}
               />
             </div>
             
-            <Modal isOpen={isRefundModalOpen} onClose={() => setIsRefundModalOpen(false)}>
+            <Modal isOpen={isRefundModalOpen} onClose={() => setIsRefundModalOpen(false)} isDarkMode={isDarkMode}>
               <div className="text-center">
-                <p className="mb-4">결제를 취소하시겠습니까?</p>
+                <p className={`mb-4 ${isDarkMode ? 'text-white' : ''}`}>결제를 취소하시겠습니까?</p>
                 <div className="flex justify-center gap-4">
                   <button
                     className="bg-red-500 text-white px-8 py-1 rounded hover:bg-red-600"
@@ -460,7 +475,7 @@ export default function OrderPage() {
                     예
                   </button>
                   <button
-                    className="bg-gray-300 px-4 py-1 rounded hover:bg-gray-400"
+                    className={`${isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400'} px-4 py-1 rounded`}
                     onClick={() => setIsRefundModalOpen(false)}
                   >
                     아니오
@@ -473,27 +488,27 @@ export default function OrderPage() {
             </ReceiptModal>
           </>
         )}
-        <div className="flex flex-col p-4 items-center justify-between">
+        <div className={`flex flex-col p-4 items-center justify-between ${isDarkMode ? 'border-l border-gray-700' : ''}`}>
           <div className="flex flex-row w-full gap-1 px-2">
-            <Archive className="mt-1 text-gray-700" />
-            <span className="font-sans text-2xl text-left font-semibold text-gray-800">
+            <Archive className={`mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`} />
+            <span className={`font-sans text-2xl text-left font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
               Order
             </span>
           </div>
           <div className="flex flex-col items-center justify-center mb-20">
-            <p className="flex text-gray-700 border-b border-gray-300 mb-4 w-full p-1 pl-2 text-center">
+            <p className={`flex ${isDarkMode ? 'text-gray-300 border-gray-700' : 'text-gray-700 border-gray-300'} border-b mb-4 w-full p-1 pl-2 text-center`}>
               Details
             </p>
             <div className="flex flex-col">
               <div className="flex flex-row justify-center items-center gap-2 mb-4">
                 <button
-                  className="bg-gray-200 rounded w-[9rem] py-6 hover:bg-gray-300"
+                  className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded w-[9rem] py-6`}
                   onClick={handleDailySales}
                 >
                   당일 매출 내역
                 </button>
                 <button
-                  className="bg-gray-200 rounded w-[9rem] py-6 hover:bg-gray-300"
+                  className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded w-[9rem] py-6`}
                   onClick={handleMonthlySales}
                 >
                   월간 매출 내역
@@ -501,7 +516,7 @@ export default function OrderPage() {
               </div>
               <div className="flex flex-row justify-start items-center gap-4">
                 <button
-                  className="bg-gray-200 rounded w-[9rem] py-6 hover:bg-gray-300"
+                  className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded w-[9rem] py-6`}
                   onClick={handleCancelledOrders}
                 >
                   반품 결제 내역
@@ -511,13 +526,13 @@ export default function OrderPage() {
           </div>
           <div className="flex flex-row justify-center items-center gap-2 my-2">
             <button
-              className="bg-gray-200 rounded py-6 w-[9rem] hover:bg-gray-300"
+              className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded py-6 w-[9rem]`}
               onClick={() => setCalculatorModalOpen(true)}
             >
               계산기
             </button>
             <button
-              className="bg-gray-200 rounded py-6 w-[9rem] hover:bg-gray-300"
+              className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded py-6 w-[9rem]`}
               onClick={() => router.push("/setting")}
             >
               Back
@@ -525,7 +540,7 @@ export default function OrderPage() {
           </div>
         </div>
       </div>
-      <CalculatorModal />
+      <CalculatorModal isDarkMode={isDarkMode} />
     </div>
   );
 }

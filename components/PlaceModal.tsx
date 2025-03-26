@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
+import { useThemeStore } from "@/store/themeStore";
 import { usePosStore, SelectedItem, Menu } from "../store/usePosStore"; // SelectedItem 임포트
 import { motion, AnimatePresence } from "framer-motion";
 import Cookies from "js-cookie";
@@ -28,9 +29,14 @@ interface PlaceModalProps {
 export default function PlaceModal({
   onClose,
   onPlaceSelected,
+  isDarkMode: propIsDarkMode,
 }: PlaceModalProps) {
   const { menuCache, fetchUnpaidOrderByPlace, setOrderId, setSelectedItems } =
     usePosStore();
+  const themeStore = useThemeStore();
+  // Props로 받은 isDarkMode가 없으면 store에서 가져옴
+  const isDarkMode = propIsDarkMode !== undefined ? propIsDarkMode : themeStore.isDarkMode;
+  
   const [storeId, setStoreId] = useState<number | null>(null);
   const cols = 11;
   const rows = 9;
@@ -51,7 +57,7 @@ export default function PlaceModal({
       if (saved && Number(saved) !== storeId) {
         setStoreId(Number(saved));
       }
-    }, 100); // 1초마다 확인
+    }, 100); // 0.1초마다 확인
     return () => clearInterval(interval);
   }, [storeId]);
 
@@ -214,13 +220,17 @@ export default function PlaceModal({
       return (
         <button
           onClick={() => handleEmptyCellClick(row, col)}
-          className={`w-full h-full ${
+          className={`w-full h-full rounded ${
             isEditMode
-              ? "bg-gray-300 cursor-pointer"
-              : "bg-white pointer-events-none"
+              ? isDarkMode 
+                ? "bg-gray-700 hover:bg-gray-600 cursor-pointer" 
+                : "bg-gray-300 hover:bg-gray-400 cursor-pointer"
+              : isDarkMode 
+                ? "bg-gray-800 pointer-events-none" 
+                : "bg-white pointer-events-none"
           }`}
         >
-          {isEditMode && <span className="text-xs text-gray-600">+</span>}
+          {isEditMode && <span className={`text-xs ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>+</span>}
         </button>
       );
     } else {
@@ -228,7 +238,11 @@ export default function PlaceModal({
         <button
           onClick={() => handlePlaceClick(seat)}
           onDoubleClick={() => isEditMode && handleDeletePlace(seat)}
-          className="w-full h-full bg-gray-100 flex items-center justify-center rounded"
+          className={`w-full h-full ${
+            isDarkMode 
+              ? "bg-gray-700 hover:bg-gray-600 text-white" 
+              : "bg-gray-100 hover:bg-gray-200"
+          } flex items-center justify-center rounded`}
         >
           {seat.placeName}
         </button>
@@ -239,7 +253,7 @@ export default function PlaceModal({
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed rounded-lg inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center"
+        className="fixed rounded-lg inset-0 bg-black bg-opacity-40 backdrop-blur-sm z-50 flex items-center justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -247,7 +261,7 @@ export default function PlaceModal({
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         <motion.div
-          className="relative rounded-lg w-[800px] h-[600px] bg-white shadow"
+          className={`relative border border-[#374151] rounded-lg w-[800px] h-[600px] ${isDarkMode ? "bg-gray-800" : "bg-white"} shadow-xl`}
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -259,42 +273,56 @@ export default function PlaceModal({
               {isEditMode && (
                 <button
                   onClick={handleSave}
-                  className="px-3 py-0.5 bg-gray-100 font-semibold hover:bg-gray-200 border text-black rounded-sm"
+                  className={`px-3 py-0.5 ${
+                    isDarkMode 
+                      ? "bg-gray-700 hover:bg-gray-600 text-white" 
+                      : "bg-gray-100 hover:bg-gray-200 text-black"
+                  } font-semibold border ${isDarkMode ? "border-gray-600" : ""} rounded-sm`}
                 >
                   Save
                 </button>
               )}
               <button
                 onClick={handleEdit}
-                className="px-2 py-0.5 bg-gray-100 font-semibold hover:bg-gray-300 border text-black rounded-sm"
+                className={`px-2 py-0.5 ${
+                  isDarkMode 
+                    ? "bg-gray-700 hover:bg-gray-600 text-white" 
+                    : "bg-gray-100 hover:bg-gray-300 text-black"
+                } font-semibold border ${isDarkMode ? "border-gray-600" : ""} rounded-sm`}
               >
                 Edit
               </button>
               <button
                 onClick={handleCloseButton}
-                className="px-1.5 py-0.5 bg-[#C72121] text-[1.4rem] text-white rounded-sm"
+                className="px-1.5 py-0.5 bg-[#C72121] hover:bg-red-700 text-[1.4rem] text-white rounded-sm"
               >
                 ✕
               </button>
             </div>
           </div>
           {editingCell && (
-            <div className="absolute h-[35px] w-full flex items-center px-2 py-1 bg-gray-200">
+            <div className={`absolute h-[35px] w-full flex items-center px-2 py-1 ${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
               <input
-                className="flex-1 h-full px-2 text-md"
+                className={`flex-1 h-full px-2 text-md ${
+                  isDarkMode ? "bg-gray-800 text-white border-gray-600" : ""
+                }`}
                 placeholder="Enter table name"
                 value={newPlaceName}
                 onChange={(e) => setNewPlaceName(e.target.value)}
               />
               <button
                 onClick={handleConfirmNewPlace}
-                className="ml-2 rounded px-3 py-0.5 bg-blue-500 text-white text-sm"
+                className={`ml-2 rounded px-3 py-0.5 ${
+                  isDarkMode 
+                    ? "bg-blue-700 hover:bg-blue-600" 
+                    : "bg-blue-500 hover:bg-blue-400"
+                } text-white text-sm`}
               >
                 ✓
               </button>
             </div>
           )}
-          <div className="w-full h-[calc(100%-3.5rem)] p-3 mt-5 overflow-auto">
+          <div className={`w-full h-[calc(100%-3.5rem)] p-3 mt-5 overflow-auto ${isDarkMode ? "bg-gray-900" : "bg-gray-200"}`}>
             <div className="grid grid-cols-11 grid-rows-9 gap-1 w-full h-full">
               {Array.from({ length: rows }).map((_, rowIdx) =>
                 Array.from({ length: cols }).map((_, colIdx) => (

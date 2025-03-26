@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface ModalProps {
   isOpen: boolean;
+  isDarkMode?: boolean; 
   onClose: () => void;
   children: ReactNode;
 }

@@ -4,6 +4,7 @@ import { HexColorPicker } from "react-colorful";
 
 type AddCategoryModalProps = {
   isOpen: boolean;
+  isDarkMode?: boolean; 
   onClose: () => void;
   onSubmit: (name: string, color: string) => void;
 };

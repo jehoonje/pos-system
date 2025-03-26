@@ -31,7 +31,7 @@ export default function CategorySidebar({
     <button
       onClick={() => onSelectCategory(category)}
       style={{ backgroundColor: category.categoryStyle.colorCode }}
-      className={`border border-gray-400 rounded min-w-[5rem] max-w-full h-10 mb-2 px-4 
+      className={`rounded min-w-[5rem] max-w-full h-10 mb-2 px-4 
                   ${isSelected ? "bg-blue-500 text-white" : "bg-white text-gray-700"} 
                   whitespace-nowrap`}
     >

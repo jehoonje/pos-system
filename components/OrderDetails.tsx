@@ -10,6 +10,7 @@ interface OrderDetailsProps {
   order?: Order | null; // 주 데이터로 사용
   handlePrint: () => void;
   setIsRefundModalOpen: (open: boolean) => void;
+  isDarkMode?: boolean;
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({
@@ -19,16 +20,17 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
   order,
   handlePrint,
   setIsRefundModalOpen,
+  isDarkMode = false
 }) => (
-  <div className="w-3/4 flex flex-col border-r border-gray-400">
-    <div className="flex items-center justify-center uppercase text-lg font-medium border-b border-gray-400 h-[3rem] mb-4">
+  <div className={`w-3/4 flex flex-col ${isDarkMode ? 'border-r border-gray-700' : 'border-r border-gray-400'}`}>
+    <div className={`flex items-center justify-center uppercase text-lg font-medium ${isDarkMode ? 'border-b border-gray-700 text-white' : 'border-b border-gray-400'} h-[3rem] mb-4`}>
       {placeName || ""}
     </div>
-    <div className="flex-1 border-b border-gray-300">
+    <div className={`flex-1 ${isDarkMode ? 'border-b border-gray-700' : 'border-b border-gray-300'}`}>
       {loadingReceipt ? (
         <p></p>
       ) : order ? (
-        <div className="text-sm h-full flex flex-col justify-between">
+        <div className={`text-sm h-full flex flex-col justify-between ${isDarkMode ? 'text-white' : ''}`}>
           <div className="flex flex-col text-md w-full">
             {order.menuDetail.map((menu, index) => (
               <div
@@ -47,11 +49,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
             ))}
           </div>
           <div className="flex flex-col">
-            <div className="border-t border-gray-300 py-2 flex flex-row justify-between px-4">
+            <div className={`${isDarkMode ? 'border-t border-gray-700' : 'border-t border-gray-300'} py-2 flex flex-row justify-between px-4`}>
               <p>주문번호 :</p>
               <span>{order.orderId}</span>
             </div>
-            <div className="border-t border-gray-300 py-2 flex flex-col px-4">
+            <div className={`${isDarkMode ? 'border-t border-gray-700' : 'border-t border-gray-300'} py-2 flex flex-col px-4`}>
               {order.paymentType === "CASH" ? (
                 <div className="flex flex-row justify-between">
                   <p>현금 결제 :</p>
@@ -84,14 +86,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 <p>결제 정보 없음</p>
               )}
             </div>
-            <div className="border-t border-gray-300 py-2 flex flex-row justify-between px-4">
+            <div className={`${isDarkMode ? 'border-t border-gray-700' : 'border-t border-gray-300'} py-2 flex flex-row justify-between px-4`}>
               <p>Total :</p>
               <p> ₩{order.price.toLocaleString()}</p>
             </div>
           </div>
         </div>
       ) : receipt ? (
-        <div className="text-sm h-full flex flex-col justify-between">
+        <div className={`text-sm h-full flex flex-col justify-between ${isDarkMode ? 'text-white' : ''}`}>
           <div className="flex flex-col text-md w-full">
             {receipt.menuList.map((menu, index) => (
               <div
@@ -110,11 +112,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
             ))}
           </div>
           <div className="flex flex-col">
-            <div className="border-t border-gray-300 py-2 flex flex-row justify-between px-4">
+            <div className={`${isDarkMode ? 'border-t border-gray-700' : 'border-t border-gray-300'} py-2 flex flex-row justify-between px-4`}>
               <p>영수증번호 :</p>
               <span>{receipt.receiptDate}</span>
             </div>
-            <div className="border-t border-gray-300 py-2 flex flex-col px-4">
+            <div className={`${isDarkMode ? 'border-t border-gray-700' : 'border-t border-gray-300'} py-2 flex flex-col px-4`}>
               {receipt.cardInfoList.map((cardInfo, index) => (
                 <div key={index} className="flex flex-col">
                   {cardInfo.paymentType === "CASH" ? (
@@ -139,25 +141,25 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 </div>
               ))}
             </div>
-            <div className="border-t border-gray-300 py-2 flex flex-row justify-between px-4">
+            <div className={`${isDarkMode ? 'border-t border-gray-700' : 'border-t border-gray-300'} py-2 flex flex-row justify-between px-4`}>
               <p>Total :</p>
               <p> ₩{receipt.totalAmount.toLocaleString()}</p>
             </div>
           </div>
         </div>
       ) : (
-        <p className="text-center text-gray-500">주문을 선택하세요.</p>
+        <p className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>주문을 선택하세요.</p>
       )}
     </div>
-    <div className="flex text-gray-700 justify-center gap-2 m-4 mb-6">
+    <div className={`flex ${isDarkMode ? 'text-white' : 'text-gray-700'} justify-center gap-2 m-4 mb-6`}>
       <button
-        className="bg-gray-200 rounded w-1/2 py-6 hover:bg-gray-300"
+        className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} rounded w-1/2 py-6`}
         onClick={handlePrint}
       >
         Print
       </button>
       <button
-        className="bg-gray-200 rounded w-1/2 py-6 hover:bg-gray-300"
+        className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} rounded w-1/2 py-6`}
         onClick={() => setIsRefundModalOpen(true)}
       >
         Refund

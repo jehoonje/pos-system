@@ -1,12 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useThemeStore } from "@/store/themeStore";
 import axiosInstance from "../../lib/axiosInstance";
 import Spinner from "../../components/Spinner";
 import CategorySidebar from "../../components/CategorySidebar";
 import AddItemModal from "../../components/AddItemModal";
 import ModifyItemModal from "../../components/ModifyItemModal";
 import GridCell from "../../components/EditGridCell";
+import AlertModal from "../../components/AlertModal";
 import { ChevronLeft } from "lucide-react";
 import Cookies from "js-cookie";
 
@@ -46,6 +48,7 @@ type MenuItem = {
 
 export default function EditMenuPage() {
   const router = useRouter();
+  const { isDarkMode } = useThemeStore();
 
   // storeId, 토큰
   const [storeId, setStoreId] = useState<number | null>(null);
@@ -71,10 +74,17 @@ export default function EditMenuPage() {
   const [hasHalfItem, setHasHalfItem] = useState(false);
   const [hasHalfInSameCell, setHasHalfInSameCell] = useState(false);
 
+  // AlertModal 관련 state
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    message: "",
+    type: "info" as "error" | "success" | "warning" | "info"
+  });
+
   useEffect(() => {
     const storedToken = Cookies.get("accessToken");
     if (!storedToken) {
-      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+      showAlert("세션이 만료되었습니다. 다시 로그인해주세요.", "error");
       router.push("/");
       return;
     }
@@ -82,18 +92,43 @@ export default function EditMenuPage() {
 
     const savedStoreId = Cookies.get("currentStoreId");
     if (!savedStoreId) {
-      alert("Store ID가 없습니다. 다시 로그인해주세요.");
+      showAlert("Store ID가 없습니다. 다시 로그인해주세요.", "error");
       router.push("/");
       return;
     }
     setStoreId(Number(savedStoreId));
   }, [router]);
 
+  // 다크모드 배경색 적용
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (isDarkMode) {
+        document.body.style.backgroundColor = "#111827";
+      } else {
+        document.body.style.backgroundColor = "";
+      }
+    }
+  }, [isDarkMode]);
+
   useEffect(() => {
     if (storeId && token) {
       fetchCategories(storeId);
     }
   }, [storeId, token]);
+
+  // AlertModal을 표시하는 함수
+  const showAlert = (message: string, type: "error" | "success" | "warning" | "info" = "info") => {
+    setAlertModal({
+      isOpen: true,
+      message,
+      type
+    });
+  };
+
+  // AlertModal을 닫는 함수
+  const closeAlert = () => {
+    setAlertModal(prev => ({ ...prev, isOpen: false }));
+  };
 
   const fetchCategories = async (storeId: number) => {
     try {
@@ -105,7 +140,7 @@ export default function EditMenuPage() {
       }
     } catch (err) {
       console.error("카테고리 조회 실패:", err);
-      alert("카테고리 조회 실패");
+      showAlert("카테고리 조회에 실패했습니다.", "error");
     } finally {
       setLoadingCategories(false);
     }
@@ -123,7 +158,7 @@ export default function EditMenuPage() {
       await fetchMenusByCategory(categoryId, forceReload);
     } catch (err) {
       console.error("메뉴 조회 실패:", err);
-      alert("메뉴 조회 실패");
+      showAlert("메뉴 조회에 실패했습니다.", "error");
     }
   };
 
@@ -182,21 +217,21 @@ export default function EditMenuPage() {
       (m) => m.menuStyle.positionX === targetX && m.menuStyle.positionY === targetY
     );
     if (cellMenus.some((m) => m.menuStyle.sizeType === "FULL")) {
-      alert("이 셀에는 이미 FULL 메뉴가 있습니다.");
+      showAlert("이 셀에는 이미 FULL 메뉴가 있습니다.", "warning");
       return;
     }
     const halfCount = cellMenus.filter((m) => m.menuStyle.sizeType === "HALF").length;
     if (halfCount === 2) {
-      alert("이 셀에는 이미 HALF 메뉴가 2개 있어 더 이상 놓을 수 없습니다.");
+      showAlert("이 셀에는 이미 HALF 메뉴가 2개 있어 더 이상 놓을 수 없습니다.", "warning");
       return;
     }
     if (halfCount >= 1 && draggedMenu.menuStyle.sizeType === "FULL") {
-      alert("이 셀에는 이미 HALF 메뉴가 있으므로 FULL 메뉴를 놓을 수 없습니다.");
+      showAlert("이 셀에는 이미 HALF 메뉴가 있으므로 FULL 메뉴를 놓을 수 없습니다.", "warning");
       return;
     }
     try {
       if (!token) {
-        alert("토큰이 없습니다. 다시 로그인해주세요.");
+        showAlert("토큰이 없습니다. 다시 로그인해주세요.", "error");
         return;
       }
       const bodyData = {
@@ -222,17 +257,17 @@ export default function EditMenuPage() {
       }
     } catch (err) {
       console.error("메뉴 위치 변경 실패:", err);
-      alert("메뉴 위치 변경 실패");
+      showAlert("메뉴 위치 변경에 실패했습니다.", "error");
     }
   };
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="flex items-center justify-center h-screen w-screen relative">
-        <div className="relative w-4/5 h-4/5 bg-white bg-opacity-20 border border-gray-400 rounded-2xl p-6 flex flex-row shadow-lg">
+      <div className={`flex items-center justify-center h-screen w-screen relative ${isDarkMode ? 'bg-gray-900' : ''}`}>
+        <div className={`relative border w-4/5 h-4/5 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} rounded-2xl p-6 flex flex-row`}>
           <button
             onClick={() => router.push("/setting")}
-            className="absolute top-0 left-0 bg-transparent px-2 py-2 text-gray-500 text-sm rounded hover:text-gray-400"
+            className={`absolute top-0 left-0 bg-transparent px-2 py-2 ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-500 hover:text-gray-400'} text-sm rounded`}
           >
             <ChevronLeft className="w-8 h-8" />
           </button>
@@ -254,7 +289,7 @@ export default function EditMenuPage() {
                   ))}
                 </div>
                 <div className="w-full h-full flex flex-col items-center justify-center p-4">
-                  <div className="w-full h-full max-w-full max-h-full grid grid-cols-5 grid-rows-4 gap-1 border border-blue-500 p-2 rounded-lg mb-2">
+                  <div className={`w-full h-full max-w-full max-h-full grid grid-cols-5 grid-rows-4 gap-1 ${isDarkMode ? 'border-blue-700' : 'border-blue-500'} border p-2 rounded-lg mb-2`}>
                     {Array.from({ length: 4 }).map((_, rowIndex) =>
                       Array.from({ length: 5 }).map((_, colIndex) => {
                         const cellMenus = currentMenus.filter(
@@ -300,6 +335,16 @@ export default function EditMenuPage() {
             )}
           </div>
         </div>
+        
+        {/* AlertModal 컴포넌트 */}
+        <AlertModal
+          isOpen={alertModal.isOpen}
+          onClose={closeAlert}
+          message={alertModal.message}
+          type={alertModal.type}
+          showConfirmButton={true}
+          confirmText="확인"
+        />
       </div>
     </DndProvider>
   );

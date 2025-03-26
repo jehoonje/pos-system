@@ -5,6 +5,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { usePosStore } from "@/store/usePosStore";
 import { motion, AnimatePresence } from "framer-motion";
 import Modal from "../../components/Modal";
+import { useThemeStore } from "@/store/themeStore";
 
 // 타입 정의
 interface Item {
@@ -35,6 +36,7 @@ export default function PaymentPage() {
   const isNewOrderParam = searchParams.get("isNewOrder");
 
   const { storeId, resetData, fetchUnpaidOrderByPlace } = usePosStore();
+  const { isDarkMode } = useThemeStore();
 
   // 상태 관리
   const [totalAmount, setTotalAmount] = useState(0);
@@ -53,6 +55,17 @@ export default function PaymentPage() {
   const [showMinAmountModal, setShowMinAmountModal] = useState(false);
   const [latestPaymentId, setLatestPaymentId] = useState<number | null>(null);
   const [paymentIds, setPaymentIds] = useState<number[]>([]); // 모든 결제 ID 추적
+
+  // 다크모드 배경색 적용
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (isDarkMode) {
+        document.body.style.backgroundColor = "#111827";
+      } else {
+        document.body.style.backgroundColor = "";
+      }
+    }
+  }, [isDarkMode]);
 
   // useMemo를 사용하여 initialTotal 계산
   const initialTotal = useMemo(() => {
@@ -408,15 +421,15 @@ export default function PaymentPage() {
 
   return (
     <Suspense fallback={<div></div>}>
-    <div className="flex w-full h-screen font-mono">
+    <div className={`flex w-full h-screen font-mono ${isDarkMode ? 'bg-gray-900' : ''}`}>
       <button
         onClick={handleCancel}
-        className="absolute top-4 left-4 p-2 text-red-500 text-sm"
+        className={`absolute top-4 left-4 p-2 ${isDarkMode ? 'text-red-400' : 'text-red-500'} text-sm`}
       >
         Cancel
       </button>
-      <div className="flex-1 flex items-center justify-center text-6xl font-bold text-gray-800">
-        ₩{" "}
+      <div className="flex-1 flex items-center justify-center text-6xl font-bold">
+        <span className={isDarkMode ? 'text-white' : 'text-gray-800'}>₩ </span>
         <AnimatePresence mode="popLayout">
           {totalAmount
             .toLocaleString()
@@ -440,6 +453,7 @@ export default function PaymentPage() {
                     display: "inline-block",
                     width: isNumber ? "1ch" : "auto",
                   }}
+                  className={isDarkMode ? 'text-white' : 'text-gray-800'}
                 >
                   {char}
                 </motion.span>
@@ -451,7 +465,7 @@ export default function PaymentPage() {
       <div className="flex-1 p-4 flex flex-col justify-around items-center relative">
         {/* Cash 섹션 */}
         <div className="w-3/4 flex flex-col items-center">
-          <h3 className="text-gray-600 text-center font-bold mb-10">Cash</h3>
+          <h3 className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-center font-bold mb-10`}>Cash</h3>
           <div className="flex space-x-2 mb-4 w-full">
             <div className="relative flex w-1/2">
               <input
@@ -459,17 +473,17 @@ export default function PaymentPage() {
                 value={charge}
                 onChange={handleChargeChange}
                 placeholder="₩ 0"
-                className="py-2 px-4 border border-gray-300 rounded-md w-full bg-white"
+                className={`py-2 px-4 border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} rounded-md w-full`}
                 readOnly={!isOtherClicked}
               />
               <button
                 onClick={handleChargeReset}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700"
+                className={`absolute right-2 top-1/2 transform -translate-y-1/2 text-sm ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 Reset
               </button>
             </div>
-            <span className="py-2 px-4 text-xs border border-gray-300 rounded-md w-1/2 bg-white flex items-center justify-start">
+            <span className={`py-2 px-4 text-xs border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} rounded-md w-1/2 flex items-center justify-start`}>
               changes ₩ {changes.toLocaleString()}
             </span>
           </div>
@@ -479,7 +493,7 @@ export default function PaymentPage() {
                 <button
                   key={value}
                   onClick={() => handleCashButtonClick(value)}
-                  className="py-2 px-4 bg-gray-200 rounded-md hover:bg-gray-300 border border-gray-300 text-center w-1/3"
+                  className={`py-2 px-4 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' : 'bg-gray-200 border-gray-300 hover:bg-gray-300'} rounded-md border text-center w-1/3`}
                 >
                   ₩ {value.toLocaleString()}
                 </button>
@@ -488,13 +502,13 @@ export default function PaymentPage() {
             <div className="flex justify-center gap-2 w-full">
               <button
                 onClick={() => handleCashButtonClick(50000)}
-                className="py-2 px-4 bg-gray-200 rounded-md hover:bg-gray-300 border border-gray-300 text-center w-1/3"
+                className={`py-2 px-4 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' : 'bg-gray-200 border-gray-300 hover:bg-gray-300'} rounded-md border text-center w-1/3`}
               >
                 ₩ {(50000).toLocaleString()}
               </button>
               <button
                 onClick={handleOtherClick}
-                className="py-2 px-4 bg-gray-200 rounded-md hover:bg-gray-300 border border-gray-300 text-blue-500 text-center w-1/3"
+                className={`py-2 px-4 ${isDarkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' : 'bg-gray-200 border-gray-300 hover:bg-gray-300'} rounded-md border ${isDarkMode ? 'text-blue-400' : 'text-blue-500'} text-center w-1/3`}
               >
                 others
               </button>
@@ -504,21 +518,23 @@ export default function PaymentPage() {
 
         {/* Other payment methods & Done 버튼 */}
         <div className="w-3/4 mt-4 flex flex-col items-center">
-          <h3 className="text-gray-600 font-bold text-center mb-10">
+          <h3 className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} font-bold text-center mb-10`}>
             Other payment methods
           </h3>
           <div className="flex space-x-2 mb-4 w-full justify-center">
             <button
               onClick={handleCreditCardClick}
-              className="py-2 px-4 bg-gray-200 rounded-md hover:bg-gray-300 border border-gray-300 flex-1"
+              className={`py-2 px-4 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' : 'bg-gray-200 border-gray-300 hover:bg-gray-300'} rounded-md border flex-1`}
             >
               Credit card
             </button>
             <button
               onClick={handleSplitToggle}
-              className={`py-2 px-4 bg-gray-200 rounded-md hover:bg-gray-300 border border-gray-300 flex-1 ${
-                isSplitVisible ? "bg-blue-100" : ""
-              }`}
+              className={`py-2 px-4 ${
+                isDarkMode 
+                  ? `bg-gray-700 border-gray-600 text-white hover:bg-gray-600 ${isSplitVisible ? 'bg-blue-900' : ''}` 
+                  : `bg-gray-200 border-gray-300 hover:bg-gray-300 ${isSplitVisible ? 'bg-blue-100' : ''}`
+              } rounded-md border flex-1`}
             >
               Split {isSplitVisible ? "(On)" : ""}
             </button>
@@ -531,7 +547,7 @@ export default function PaymentPage() {
                   value={splitAmount === 0 ? "" : splitAmount}
                   onChange={handleSplitChange}
                   placeholder="금액 입력"
-                  className="py-2 px-4 border border-gray-300 rounded-md w-full"
+                  className={`py-2 px-4 border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} rounded-md w-full`}
                 />
               </div>
             )}
@@ -540,10 +556,12 @@ export default function PaymentPage() {
               layout
               animate={{ x: 0, width: isSplitVisible ? "49%" : "100%" }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={`py-2 rounded-md border border-gray-300 ${
+              className={`py-2 rounded-md border ${
                 charge + paidByCard + paidByCash >= initialTotal
                   ? "bg-[#007aff] text-white font-bold"
-                  : "bg-gray-200 text-gray-700 cursor-not-allowed"
+                  : isDarkMode 
+                    ? "bg-gray-700 text-gray-400 border-gray-600 cursor-not-allowed" 
+                    : "bg-gray-200 text-gray-700 border-gray-300 cursor-not-allowed"
               } flex items-center justify-center`}
               disabled={charge + paidByCard + paidByCash < initialTotal}
             >
@@ -564,16 +582,16 @@ export default function PaymentPage() {
             transition={{ duration: 0.3 }}
           >
             <motion.div
-              className="bg-white p-6 rounded-md max-w-sm w-full shadow-lg"
+              className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'} p-6 rounded-md max-w-sm w-full shadow-lg`}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className={`text-lg font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-900'} mb-2`}>
                 최소 결제 금액 안내
               </h3>
-              <p className="text-gray-700 mb-4">
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-4`}>
                 1000원 이상부터 결제가 가능합니다.
               </p>
               <div className="mt-4 flex justify-end">
@@ -590,8 +608,8 @@ export default function PaymentPage() {
       </AnimatePresence>
 
       {/* 영수증 출력 여부 확인 모달 */}
-      <Modal isOpen={showReceiptModal} onClose={handleReceiptYes}>
-        <div className="bg-white p-6 rounded-md">
+      <Modal isOpen={showReceiptModal} onClose={handleReceiptYes} isDarkMode={isDarkMode}>
+        <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'} p-6 rounded-md`}>
           <p>영수증을 출력하시겠습니까?</p>
           <div className="mt-4 flex justify-end space-x-9">
             <button
@@ -602,7 +620,7 @@ export default function PaymentPage() {
             </button>
             <button
               onClick={handleReceiptYes}
-              className="py-1 px-4 bg-gray-200 hover:bg-gray-100 rounded-md"
+              className={`py-1 px-4 ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-100'} rounded-md`}
             >
               아니오
             </button>

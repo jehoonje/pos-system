@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useFormStore } from "@/store/formStore";
+import { useThemeStore } from "@/store/themeStore";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
 import { SquareChartGantt } from "lucide-react";
@@ -19,6 +20,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Text, Html, OrbitControls, useGLTF } from "@react-three/drei";
 import _ from "lodash";
 import { motion, AnimatePresence } from "framer-motion";
+import Spinner from "@/components/Spinner";
 
 interface AverageValueData {
   averageValue: number;
@@ -64,7 +66,13 @@ function AutoRotate({ children }: { children: React.ReactNode }) {
   return <group ref={groupRef}>{children}</group>;
 }
 
-function AverageValueVisual({ data }: { data: AverageValueData | undefined }) {
+function AverageValueVisual({ 
+  data, 
+  isDarkMode 
+}: { 
+  data: AverageValueData | undefined; 
+  isDarkMode: boolean 
+}) {
   if (!data) return null;
 
   const [hover, setHover] = useState(false);
@@ -100,19 +108,22 @@ function AverageValueVisual({ data }: { data: AverageValueData | undefined }) {
     }
   });
 
+  const textColor = isDarkMode ? "#ffffff" : "#333";
+  const descriptionColor = isDarkMode ? "#e2e8f0" : "#1e293b";
+
   return (
     <group>
       <pointLight
         position={[0, 1, -3]}
-        intensity={10}
+        intensity={isDarkMode ? 8 : 10}
         distance={10}
-        color="#ffffff"
+        color={isDarkMode ? "#aaaaff" : "#ffffff"}
       />
       <spotLight
         position={[0, 1, 2]}
         angle={Math.PI / 4}
         penumbra={1}
-        intensity={10}
+        intensity={isDarkMode ? 8 : 10}
         target-position={[0, -1, -2]}
       />
       {/* GLB model use */}
@@ -127,7 +138,7 @@ function AverageValueVisual({ data }: { data: AverageValueData | undefined }) {
       <Text
         position={[0, 2.5, 0]}
         fontSize={0.8}
-        color="#333"
+        color={textColor}
         font="/NanumGothic-Bold.json"
         anchorX="center"
         anchorY="middle"
@@ -138,7 +149,7 @@ function AverageValueVisual({ data }: { data: AverageValueData | undefined }) {
       <Text
         position={[0, 1.5, 0]}
         fontSize={0.4}
-        color="#1e293b"
+        color={descriptionColor}
         font="/NanumGothic-Bold.json"
         anchorX="center"
         anchorY="middle"
@@ -153,7 +164,7 @@ function AverageValueVisual({ data }: { data: AverageValueData | undefined }) {
 useGLTF.preload("/3d/note.glb");
 
 const CategoryVisual = React.memo(
-  ({ data }: { data: CategoryData[] | undefined }) => {
+  ({ data, isDarkMode }: { data: CategoryData[] | undefined; isDarkMode: boolean }) => {
     if (!data || data.length === 0) return null;
 
     const colors = ["#fcd34d", "#f87171", "#60a5fa", "#4ade80", "#a78bfa"];
@@ -173,12 +184,15 @@ const CategoryVisual = React.memo(
       }
     }, []);
 
+    const textColor = isDarkMode ? "#ffffff" : "#1e293b";
+    const valueColor = isDarkMode ? "#e2e8f0" : "#475569";
+
     return (
       <group ref={groupRef}>
         <Text
           position={[0, 3, 0]}
           fontSize={0.4}
-          color="#1e293b"
+          color={textColor}
           font="/NanumGothic-Bold.json"
           anchorX="center"
           anchorY="middle"
@@ -209,7 +223,7 @@ const CategoryVisual = React.memo(
               <Text
                 position={[0, baseY - 0.5, 0]}
                 fontSize={0.3}
-                color="#1e293b"
+                color={textColor}
                 font="/NanumGothic-Bold.json"
                 anchorX="center"
                 anchorY="middle"
@@ -220,7 +234,7 @@ const CategoryVisual = React.memo(
               <Text
                 position={[0, baseY + height + 0.5, 0]}
                 fontSize={0.5}
-                color="#475569"
+                color={valueColor}
                 font="/NanumGothic-Bold.json"
                 anchorX="center"
                 anchorY="middle"
@@ -230,7 +244,7 @@ const CategoryVisual = React.memo(
 
               {activeIndex === index && (
                 <Html position={[0, baseY + height + 1.2, 0]}>
-                  <div className="bg-white p-2 rounded shadow-lg">
+                  <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'} p-2 rounded shadow-lg`}>
                     <strong>{category.categoryName}</strong>
                     <p>Sales: ${category.totalSales.toLocaleString()}</p>
                     <p>Ratio: {category.ratio}</p>
@@ -250,9 +264,11 @@ CategoryVisual.displayName = "CategoryVisual";
 function PeakTimeVisual({
   data,
   isDateSearched,
+  isDarkMode
 }: {
   data: PeakTimeData[] | undefined;
   isDateSearched?: boolean;
+  isDarkMode: boolean;
 }) {
   if (!data || data.length === 0) return null;
 
@@ -288,12 +304,16 @@ function PeakTimeVisual({
     };
   }, []);
 
+  const textColor = isDarkMode ? "#ffffff" : "#1e293b";
+  const timeRangeColor = isDarkMode ? "#d1d5db" : "#475569";
+  const dateColor = isDarkMode ? "#d1d5db" : "#475569";
+
   return (
     <group ref={groupRef} scale={isTransitioning ? 1 : 1}>
       <Text
         position={[0, 3, 0]}
         fontSize={0.4}
-        color="#1e293b"
+        color={textColor}
         font="/NanumGothic-Bold.json"
         anchorX="center"
         anchorY="middle"
@@ -322,7 +342,7 @@ function PeakTimeVisual({
                     <mesh position={[0, height / 2, 0]}>
                       <boxGeometry args={[1.2, height, 1.2]} />
                       <meshStandardMaterial
-                        color={`hsl(${210 + ((index * 30) % 360)}, 70%, 60%)`}
+                        color={`hsl(${150 + ((index * 30) % 360)}, ${isDarkMode ? '70%' : '50%'}, ${isDarkMode ? '50%' : '60%'})`}
                       />
                     </mesh>
                   </AutoRotate>
@@ -330,7 +350,7 @@ function PeakTimeVisual({
                   <Text
                     position={[0, -0.8, 0]}
                     fontSize={0.4}
-                    color="#475569"
+                    color={timeRangeColor}
                     font="/NanumGothic-Bold.json"
                     anchorX="center"
                     anchorY="middle"
@@ -341,7 +361,7 @@ function PeakTimeVisual({
                   <Text
                     position={[0, -1.4, 0]}
                     fontSize={0.3}
-                    color="#475569"
+                    color={dateColor}
                     font="/NanumGothic-Bold.json"
                     anchorX="center"
                     anchorY="middle"
@@ -351,7 +371,7 @@ function PeakTimeVisual({
                   <Text
                     position={[0, height + 0.5, 0]}
                     fontSize={0.4}
-                    color="#1e293b"
+                    color={textColor}
                     font="/NanumGothic-Bold.json"
                     anchorX="center"
                     anchorY="middle"
@@ -369,7 +389,7 @@ function PeakTimeVisual({
 }
 
 const PaymentTypeVisual = React.memo(
-  ({ data }: { data: PaymentTypeData | undefined }) => {
+  ({ data, isDarkMode }: { data: PaymentTypeData | undefined; isDarkMode: boolean }) => {
     if (!data || !data.typeAndDetail) return null;
 
     const colors = ["#3b82f6", "#f97316", "#10b981", "#8b5cf6"];
@@ -384,12 +404,15 @@ const PaymentTypeVisual = React.memo(
       }
     }, []);
 
+    const textColor = isDarkMode ? "#ffffff" : "#1e293b";
+    const valueColor = isDarkMode ? "#e2e8f0" : "#475569";
+
     return (
       <group ref={groupRef}>
         <Text
           position={[0, 3, 0]}
           fontSize={0.4}
-          color="#1e293b"
+          color={textColor}
           font="/NanumGothic-Bold.json"
           anchorX="center"
           anchorY="middle"
@@ -414,14 +437,18 @@ const PaymentTypeVisual = React.memo(
                   onPointerOut={() => setActiveSection(null)}
                 >
                   <boxGeometry args={[1.2, height, 1.2]} />
-                  <meshStandardMaterial color={colors[index % colors.length]} />
+                  <meshStandardMaterial 
+                    color={colors[index % colors.length]} 
+                    emissive={isDarkMode ? colors[index % colors.length] : undefined}
+                    emissiveIntensity={isDarkMode ? 0.2 : 0}
+                  />
                 </mesh>
               </AutoRotate>
 
               <Text
                 position={[0, -0.5, 0]}
                 fontSize={0.3}
-                color="#1e293b"
+                color={textColor}
                 font="/NanumGothic-Bold.json"
                 anchorX="center"
                 anchorY="middle"
@@ -432,7 +459,7 @@ const PaymentTypeVisual = React.memo(
               <Text
                 position={[0, height + 0.3, 0]}
                 fontSize={0.3}
-                color="#1e293b"
+                color={textColor}
                 font="/NanumGothic-Bold.json"
                 anchorX="center"
                 anchorY="middle"
@@ -443,7 +470,7 @@ const PaymentTypeVisual = React.memo(
               <Text
                 position={[0, height + 0.7, 0]}
                 fontSize={0.25}
-                color="#475569"
+                color={valueColor}
                 font="/NanumGothic-Bold.json"
                 anchorX="center"
                 anchorY="middle"
@@ -453,7 +480,7 @@ const PaymentTypeVisual = React.memo(
 
               {activeSection === index && (
                 <Html position={[0, height + 1.2, 0]}>
-                  <div className="bg-white p-2 rounded shadow-lg">
+                  <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'} p-2 rounded shadow-lg`}>
                     <strong>{payment.type}</strong>
                     <p>Amount: ${payment.amount.toLocaleString()}</p>
                     <p>Ratio: {payment.ratio}%</p>
@@ -467,7 +494,7 @@ const PaymentTypeVisual = React.memo(
         <Text
           position={[0, -3, 0]}
           fontSize={0.4}
-          color="#1e293b"
+          color={textColor}
           font="/NanumGothic-Bold.json"
           anchorX="center"
           anchorY="middle"
@@ -523,6 +550,7 @@ type AnalysisType =
 export default function ManagementPage() {
   const router = useRouter();
   const { storeId } = useFormStore();
+  const { isDarkMode } = useThemeStore();
   const [analysisType, setAnalysisType] = useState<AnalysisType>(null);
   const [fontLoaded, setFontLoaded] = useState(false);
   // States for date pickers and query
@@ -534,6 +562,17 @@ export default function ManagementPage() {
   const [prevAnalysisType, setPrevAnalysisType] = useState<AnalysisType>(null);
   // 위치 고정을 위한 상태 변수 추가
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // 다크모드 배경색 적용
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (isDarkMode) {
+        document.body.style.backgroundColor = "#111827";
+      } else {
+        document.body.style.backgroundColor = "";
+      }
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     setFontLoaded(true);
@@ -580,21 +619,21 @@ export default function ManagementPage() {
     return response.data;
   }, [storeId]);
 
-  const { data: averageData } = useQuery<AverageValueData>({
+  const { data: averageData, isLoading: averageLoading } = useQuery<AverageValueData>({
     queryKey: ["average", storeId],
     queryFn: fetchAverageValue,
     enabled: !!storeId && analysisType === "average",
     staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 
-  const { data: categoriesData } = useQuery<CategoryData[]>({
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery<CategoryData[]>({
     queryKey: ["categories", storeId],
     queryFn: fetchCategories,
     enabled: !!storeId && analysisType === "categories",
     staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 
-  const { data: peakTimeData } = useQuery<PeakTimeData[]>({
+  const { data: peakTimeData, isLoading: peakTimeLoading } = useQuery<PeakTimeData[]>({
     queryKey: ["peakTime", storeId, queryStartDate, queryEndDate],
     queryFn: () =>
       fetchPeakTime(
@@ -605,12 +644,28 @@ export default function ManagementPage() {
     staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 
-  const { data: paymentTypeData } = useQuery<PaymentTypeData>({
+  const { data: paymentTypeData, isLoading: paymentTypeLoading } = useQuery<PaymentTypeData>({
     queryKey: ["paymentType", storeId],
     queryFn: fetchPaymentType,
     enabled: !!storeId && analysisType === "paymentType",
     staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
+
+  // 현재 선택된 분석 유형에 따라 로딩 상태 확인
+  const isCurrentTypeLoading = useMemo(() => {
+    switch (analysisType) {
+      case "average":
+        return averageLoading;
+      case "categories":
+        return categoriesLoading;
+      case "peakTime":
+        return peakTimeLoading;
+      case "paymentType":
+        return paymentTypeLoading;
+      default:
+        return false;
+    }
+  }, [analysisType, averageLoading, categoriesLoading, peakTimeLoading, paymentTypeLoading]);
 
   // 분석 타입 변경 함수 - 메모이제이션
   const handleAnalysisChange = useCallback(
@@ -694,23 +749,33 @@ export default function ManagementPage() {
   // Updated getButtonClass to be more responsive
   const getButtonClass = useCallback(
     (type: AnalysisType) => {
-      return `rounded ${
+      const baseClass = `rounded text-sm ${
         type === "paymentType" ? "w-full" : "w-full sm:w-60 sm:h-12 sm:text-sm"
-      } ${type === "categories" || type === "paymentType" ? "py-0" : "py-0"} ${
+      } ${type === "categories" || type === "paymentType" ? "py-2" : "py-2"} ${
         type === "peakTime" ? "px-2" : ""
-      } ${
-        analysisType === type
-          ? "bg-blue-500 border-none sm:w-60 text-white font-bold"
-          : "bg-gray-200 sm:w-60 hover:bg-gray-300"
       } transition-all`;
+
+      if (analysisType === type) {
+        return `${baseClass} ${
+          isDarkMode
+            ? "bg-blue-700 border-none sm:w-60 text-white font-bold"
+            : "bg-blue-500 border-none sm:w-60 text-white font-bold"
+        }`;
+      } else {
+        return `${baseClass} ${
+          isDarkMode
+            ? "bg-gray-700 text-gray-200 sm:w-60 hover:bg-gray-600"
+            : "bg-gray-200 sm:w-60 hover:bg-gray-300"
+        }`;
+      }
     },
-    [analysisType]
+    [analysisType, isDarkMode]
   );
 
   return (
-    <div className="flex items-center font-mono justify-center min-h-screen w-full relative p-2 sm:p-4">
-      <div className="relative w-full max-w-7xl h-[85vh] bg-white bg-opacity-20 border border-gray-400 rounded-2xl flex flex-col md:flex-row overflow-hidden">
-        <div className="w-3/4 h-full bg-gray-50 flex flex-col">
+    <div className={`flex items-center font-mono  justify-center min-h-screen w-full relative p-2 sm:p-4 ${isDarkMode ? 'bg-gray-900' : ''}`}>
+      <div className={`relative w-full max-w-7xl border h-[85vh] ${isDarkMode ? 'bg-gray-800 bg-opacity-90 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} rounded-2xl flex flex-col md:flex-row overflow-hidden`}>
+        <div className={`w-3/4 h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} flex flex-col`}>
           <div className="flex-grow relative">
             <AnimatePresence mode="sync">
               {analysisType && fontLoaded && (
@@ -736,54 +801,67 @@ export default function ManagementPage() {
                       fov: 60,
                       position: getCameraPosition(analysisType),
                     }}
-                    onCreated={({ camera }) => {
+                    onCreated={({ camera, scene }) => {
                       camera.lookAt(0, 0, 0);
                       camera.updateProjectionMatrix();
+                      if (isDarkMode) {
+                        scene.background = new THREE.Color("#111827"); // Dark gray in dark mode
+                      } else {
+                        scene.background = new THREE.Color("#f3f4f6"); // Light gray in light mode
+                      }
                     }}
                     gl={rendererConfig}
                     dpr={[1, 2]} // 반응형 해상도 설정
                     frameloop="always" // 필요할 때만 렌더링
                   >
-                    <ambientLight intensity={0.6} />
-                    <pointLight position={[10, 10, 10]} intensity={1} />
+                    <ambientLight intensity={isDarkMode ? 0.4 : 0.6} />
+                    <pointLight position={[10, 10, 10]} intensity={isDarkMode ? 0.8 : 1} />
                     <spotLight
                       position={[0, 5, 10]}
                       angle={0.3}
                       penumbra={1}
-                      intensity={1}
+                      intensity={isDarkMode ? 0.8 : 1}
                     />
                     <CameraControls />
 
-                    {analysisType === "average" && (
-                      <AverageValueVisual data={averageData} />
+                    {analysisType === "average" && !isCurrentTypeLoading && (
+                      <AverageValueVisual data={averageData} isDarkMode={isDarkMode} />
                     )}
-                    {analysisType === "categories" && (
-                      <CategoryVisual data={categoriesData} />
+                    {analysisType === "categories" && !isCurrentTypeLoading && (
+                      <CategoryVisual data={categoriesData} isDarkMode={isDarkMode} />
                     )}
-                    {analysisType === "peakTime" && (
+                    {analysisType === "peakTime" && !isCurrentTypeLoading && (
                       <PeakTimeVisual
                         data={peakTimeData}
                         isDateSearched={!!(queryStartDate || queryEndDate)}
+                        isDarkMode={isDarkMode}
                       />
                     )}
-                    {analysisType === "paymentType" && (
-                      <PaymentTypeVisual data={paymentTypeData} />
+                    {analysisType === "paymentType" && !isCurrentTypeLoading && (
+                      <PaymentTypeVisual data={paymentTypeData} isDarkMode={isDarkMode} />
                     )}
                   </Canvas>
+                  
+                  {/* 로딩 스피너 오버레이 - Canvas 위에 절대 위치로 배치 */}
+                  {isCurrentTypeLoading && (
+                    <div className={`absolute inset-0 flex items-center justify-center ${isDarkMode ? 'bg-gray-900 bg-opacity-70' : 'bg-white bg-opacity-60'}`}>
+                      <Spinner />
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
 
             {!analysisType && (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center text-gray-500">
+              <div className={`flex items-center justify-center h-full ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                <div className="text-center">
                   <p className="text-xl mb-2">Please select an analysis type</p>
                   <p>Click on any option in the right menu</p>
                 </div>
               </div>
             )}
 
-            <div className="absolute bottom-4 right-4 bg-white bg-opacity-70 p-2 rounded text-xs">
+            <div className={`absolute bottom-4 right-4 ${isDarkMode ? 'bg-gray-800 bg-opacity-70' : 'bg-white bg-opacity-70'} p-2 rounded text-xs ${isDarkMode ? 'text-gray-300' : ''}`}>
               <p>Tip: Drag to rotate, scroll to zoom, right-click to pan</p>
             </div>
           </div>
@@ -805,7 +883,7 @@ export default function ManagementPage() {
                     startDate={selectedStartDate}
                     endDate={selectedEndDate}
                     placeholderText="Start Date"
-                    className="border py-1 rounded text-center"
+                    className={`border py-1 rounded text-center ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
                   />
                   <DatePicker
                     selected={selectedEndDate}
@@ -815,10 +893,10 @@ export default function ManagementPage() {
                     endDate={selectedEndDate}
                     minDate={selectedStartDate ? selectedStartDate : undefined}
                     placeholderText="End Date"
-                    className="border py-1 rounded text-center"
+                    className={`border py-1 rounded text-center ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
                   />
                   <button
-                    className="bg-blue-500 text-white px-4 text-sm rounded"
+                    className={`${isDarkMode ? 'bg-blue-700 hover:bg-blue-600' : 'bg-blue-500 hover:bg-blue-400'} text-white px-4 text-sm rounded`}
                     onClick={handleSearch}
                   >
                     Search
@@ -829,15 +907,15 @@ export default function ManagementPage() {
           </AnimatePresence>
         </div>
 
-        <div className="flex flex-col p-4 items-center justify-between w-1/4 bg-white">
+        <div className={`flex flex-col p-4 items-center justify-between w-1/4 ${isDarkMode ? 'bg-gray-800 border-l border-gray-700' : 'bg-white'}`}>
           <div className="flex flex-row w-full gap-1 px-2">
-            <SquareChartGantt className="mt-1 text-gray-700" />
-            <span className="font-sans text-2xl text-left font-semibold text-gray-800">
+            <SquareChartGantt className={`mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`} />
+            <span className={`font-sans text-2xl text-left font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
               Management
             </span>
           </div>
           <div className="flex flex-col items-center justify-center">
-            <p className="flex text-gray-700 border-b border-gray-300 mb-8 w-full p-1 pl-2 text-center">
+            <p className={`flex ${isDarkMode ? 'text-gray-300 border-gray-700' : 'text-gray-700 border-gray-300'} border-b mb-8 w-full p-1 pl-2 text-center`}>
               Details
             </p>
             <div className="flex flex-col">
@@ -847,6 +925,7 @@ export default function ManagementPage() {
                   whileTap={{ scale: 0.97 }}
                   className={getButtonClass("average")}
                   onClick={() => handleAnalysisChange("average")}
+                  disabled={isCurrentTypeLoading}
                 >
                   Average Order Value
                 </motion.button>
@@ -855,6 +934,7 @@ export default function ManagementPage() {
                   whileTap={{ scale: 0.97 }}
                   className={getButtonClass("categories")}
                   onClick={() => handleAnalysisChange("categories")}
+                  disabled={isCurrentTypeLoading}
                 >
                   Sales Analysis by Category
                 </motion.button>
@@ -863,6 +943,7 @@ export default function ManagementPage() {
                   whileTap={{ scale: 0.97 }}
                   className={getButtonClass("peakTime")}
                   onClick={() => handleAnalysisChange("peakTime")}
+                  disabled={isCurrentTypeLoading}
                 >
                   Sales Analysis by Time
                 </motion.button>
@@ -871,6 +952,7 @@ export default function ManagementPage() {
                   whileTap={{ scale: 0.97 }}
                   className={getButtonClass("paymentType")}
                   onClick={() => handleAnalysisChange("paymentType")}
+                  disabled={isCurrentTypeLoading}
                 >
                   Sales Analysis by Payment Method
                 </motion.button>
@@ -881,7 +963,7 @@ export default function ManagementPage() {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="bg-gray-200 rounded w-60 py-5 px-2 hover:bg-gray-300"
+              className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded w-60 py-5 px-2`}
               onClick={() => router.push("/setting")}
             >
               Back

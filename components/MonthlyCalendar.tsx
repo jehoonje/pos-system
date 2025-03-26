@@ -17,6 +17,7 @@ interface MonthlyCalendarProps {
   currentMonth: Date;
   setCurrentMonth: (date: Date) => void;
   storeId: number;
+  isDarkMode?: boolean;
 }
 
 interface CalendarDay {
@@ -30,6 +31,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   currentMonth,
   setCurrentMonth,
   storeId,
+  isDarkMode = false
 }) => {
   const [monthlyData, setMonthlyData] = useState<Record<string, number>>({});
   const [totalMonthlySales, setTotalMonthlySales] = useState(0);
@@ -120,7 +122,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   if (!orderSummaries || orderSummaries.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className={`flex items-center justify-center h-full ${isDarkMode ? 'text-white' : ''}`}>
         <p>해당 월의 매출 내역이 없습니다.</p>
       </div>
     );
@@ -129,26 +131,26 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   return (
     <div
       ref={calendarRef}
-      className="border-r border-gray-400 shadow w-full h-full flex flex-col overflow-auto"
+      className={`${isDarkMode ? 'border-r border-gray-700' : 'border-r border-gray-400'} shadow w-full h-full flex flex-col overflow-auto`}
     >
-      <div className="flex border-b border-gray-400 justify-between items-center">
-        <div className="flex w-2/5 text-center border-r border-gray-400 flex-col">
-          <div className="p-3 border-b border-gray-400 text-md">Monthly</div>
+      <div className={`flex ${isDarkMode ? 'border-b border-gray-700' : 'border-b border-gray-400'} justify-between items-center`}>
+        <div className={`flex w-2/5 text-center ${isDarkMode ? 'border-r border-gray-700 text-white' : 'border-r border-gray-400'} flex-col`}>
+          <div className={`p-3 ${isDarkMode ? 'border-b border-gray-700' : 'border-b border-gray-400'} text-md`}>Monthly</div>
           <div className="p-4 text-lg font-bold">
             Total : ₩{totalMonthlySales.toLocaleString()}
           </div>
         </div>
-        <div className="flex items-center gap-2 mr-4">
+        <div className={`flex items-center gap-2 mr-4 ${isDarkMode ? 'text-white' : ''}`}>
           <button
             onClick={handlePrevMonth}
-            className="px-2 bg-gray-200 rounded hover:bg-gray-300"
+            className={`px-2 ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded`}
           >
             {"<"}
           </button>
           <span>{format(currentMonth, "yyyy. MM")}</span>
           <button
             onClick={handleNextMonth}
-            className="px-2 bg-gray-200 rounded hover:bg-gray-300"
+            className={`px-2 ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded`}
           >
             {">"}
           </button>
@@ -159,8 +161,10 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
           <div
             key={day}
             className={`text-sm text-center ${
-              day === "일" ? "text-red-500" : "text-gray-700"
-            } bg-gray-100 py-2`}
+              day === "일" 
+                ? "text-red-500" 
+                : isDarkMode ? "text-gray-300" : "text-gray-700"
+            } ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} py-2`}
           >
             {day}
           </div>
@@ -172,8 +176,10 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
             {week.map((day, dayIndex) => (
               <div
                 key={dayIndex}
-                className={`p-1 border border-gray-200 flex flex-col justify-between ${
-                  day && isSameDay(day.date, today) ? "bg-gray-100" : "bg-white"
+                className={`p-1 ${isDarkMode ? 'border border-gray-700' : 'border border-gray-200'} flex flex-col justify-between ${
+                  day && isSameDay(day.date, today) 
+                    ? isDarkMode ? "bg-gray-600" : "bg-gray-100" 
+                    : isDarkMode ? "bg-gray-800" : "bg-white"
                 }`}
                 style={{
                   minHeight: `${cellSize}px`,
@@ -182,9 +188,9 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
               >
                 {day ? (
                   <div className="flex justify-between flex-col h-full">
-                    <div className="text-left text-gray-400 text-xs">{day.day}</div>
+                    <div className={`text-left ${isDarkMode ? 'text-gray-400' : 'text-gray-400'} text-xs`}>{day.day}</div>
                     {day.sales > 0 && (
-                      <div className="text-sm text-right">
+                      <div className={`text-sm text-right ${isDarkMode ? 'text-white' : ''}`}>
                         ₩{day.sales.toLocaleString()}
                       </div>
                     )}

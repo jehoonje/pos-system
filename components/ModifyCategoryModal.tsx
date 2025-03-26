@@ -14,6 +14,7 @@ type CategoryType = {
 
 type ModifyCategoryModalProps = {
   isOpen: boolean;
+  isDarkMode?: boolean; 
   onClose: () => void;
   category: CategoryType;
   onModify: (id: number, uiId: number, name: string, color: string) => void;

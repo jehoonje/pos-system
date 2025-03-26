@@ -50,7 +50,7 @@ export default function GridCell({
    * flex-col + flex-1 구조로 HALF 2개가 세로로 균등 분할 가능
    */
   const baseStyle =
-    "w-full h-full flex flex-col min-h-0 overflow-hidden border border-gray-300";
+    "w-full h-full flex flex-col min-h-0 overflow-hidden";
 
   // drop 영역 레퍼런스
   const dropAreaRef = useRef<HTMLDivElement>(null);

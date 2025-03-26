@@ -47,7 +47,7 @@ export default function PosPage() {
   // 다크모드 배경색 적용
   useEffect(() => {
     if (isDarkMode) {
-      document.body.style.backgroundColor = "#222";
+      document.body.style.backgroundColor = "#111827";
     } else {
       document.body.style.backgroundColor = "";
     }
@@ -257,7 +257,6 @@ export default function PosPage() {
           <PlaceModal
             onClose={handleCloseModal}
             onPlaceSelected={handlePlaceSelected}
-            isDarkMode={isDarkMode}
           />
         )}
       </div>

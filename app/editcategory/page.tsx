@@ -6,11 +6,13 @@ import ModifyCategoryModal from "../../components/ModifyCategoryModal";
 import axiosInstance from "../../lib/axiosInstance";
 import { ChevronLeft } from "lucide-react";
 import Cookies from "js-cookie";
+import { useThemeStore } from "@/store/themeStore";
 
 export default function EditCategoryPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const storeId = searchParams.get("storeId");
+  const { isDarkMode } = useThemeStore();
 
   const [categories, setCategories] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -28,6 +30,17 @@ export default function EditCategoryPage() {
       setToken(storedToken);
     }
   }, [router]);
+
+  // 다크모드 배경색 적용
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (isDarkMode) {
+        document.body.style.backgroundColor = "#111827";
+      } else {
+        document.body.style.backgroundColor = "";
+      }
+    }
+  }, [isDarkMode]);
 
   // 카테고리 목록 조회
   const fetchCategories = async () => {
@@ -153,71 +166,71 @@ export default function EditCategoryPage() {
   };
 
   return (
-    
-      <div className="flex items-center justify-center h-screen w-screen relative font-mono">
-        {/* 전체를 감싸는 박스 */}
-        <div className="relative w-4/5 h-4/5 bg-white bg-opacity-20 border border-gray-400 rounded-2xl p-6 flex flex-row shadow-lg">
-          <button
-            onClick={() => router.push("/setting")}
-            className="absolute top-0 left-0 bg-transparent px-2 py-2 text-gray-500 text-sm rounded hover:text-gray-400"
-          >
-            <ChevronLeft className="w-8 h-8" />
-          </button>
+    <div className={`flex items-center justify-center h-screen w-screen relative font-mono ${isDarkMode ? 'bg-gray-900' : ''}`}>
+      {/* 전체를 감싸는 박스 */}
+      <div className={`relative border w-4/5 h-4/5 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} rounded-2xl p-6 flex flex-row`}>
+        <button
+          onClick={() => router.push("/setting")}
+          className={`absolute top-0 left-0 bg-transparent px-2 py-2 ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-500 hover:text-gray-400'} text-sm rounded`}
+        >
+          <ChevronLeft className="w-8 h-8" />
+        </button>
 
-          {/* 왼쪽 50% (카테고리 리스트) */}
-          <div className="w-1/2 flex flex-col justify-center gap-4 items-center p-4">
-            <h2 className="text-md font-semibold mb-6">Edit Categories</h2>
+        {/* 왼쪽 50% (카테고리 리스트) */}
+        <div className="w-1/2 flex flex-col justify-center gap-4 items-center p-4">
+          <h2 className={`text-md font-semibold mb-6 ${isDarkMode ? 'text-white' : ''}`}>Edit Categories</h2>
 
-            {/* 카테고리 리스트 */}
-            <div className="w-full flex flex-wrap gap-4 justify-center">
-              {categories.map((cat) => (
-                <div
-                  key={cat.categoryId}
-                  onClick={() => openModifyModal(cat)}
-                  className="min-w-[5rem] max-w-full text-center cursor-pointer border border-gray-400 hover:bg-gray-200 py-2"
-                  style={{ backgroundColor: cat.categoryStyle.colorCode }}
-                >
-                  {cat.categoryName}
-                </div>
-              ))}
-            </div>
-
-            {/* 하단 버튼들 */}
-            <div className="flex space-x-4 mt-6">
-              <button
-                onClick={openAddModal}
-                className="px-6 py-1 text-xs bg-gray-300 rounded hover:bg-gray-400"
+          {/* 카테고리 리스트 */}
+          <div className="w-full flex flex-wrap gap-4 justify-center">
+            {categories.map((cat) => (
+              <div
+                key={cat.categoryId}
+                onClick={() => openModifyModal(cat)}
+                className={`min-w-[5rem] max-w-full text-center cursor-pointer ${isDarkMode ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-400 hover:bg-gray-200'} border py-2`}
+                style={{ backgroundColor: cat.categoryStyle.colorCode }}
               >
-                Add
-              </button>
-            </div>
+                {cat.categoryName}
+              </div>
+            ))}
           </div>
 
-          {/* 중앙 구분선 */}
-          <div className="my-6 border-l border-gray-400"></div>
-
-          {/* 오른쪽 50% (모달 렌더링 영역) */}
-          <div className="w-1/2 flex items-center justify-center">
-            {isAddModalOpen && (
-              <AddCategoryModal
-                isOpen={isAddModalOpen}
-                onClose={() => setIsAddModalOpen(false)}
-                onSubmit={handleAddCategory}
-              />
-            )}
-
-            {isModifyModalOpen && selectedCategory && (
-              <ModifyCategoryModal
-                isOpen={isModifyModalOpen}
-                onClose={() => setIsModifyModalOpen(false)}
-                category={selectedCategory}
-                onModify={handleModifyCategory}
-                onDelete={handleDeleteCategory}
-              />
-            )}
+          {/* 하단 버튼들 */}
+          <div className="flex space-x-4 mt-6">
+            <button
+              onClick={openAddModal}
+              className={`px-6 py-1 text-xs ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} rounded`}
+            >
+              Add
+            </button>
           </div>
         </div>
-      </div>
 
+        {/* 중앙 구분선 */}
+        <div className={`my-6 border-l ${isDarkMode ? 'border-gray-700' : 'border-gray-400'}`}></div>
+
+        {/* 오른쪽 50% (모달 렌더링 영역) */}
+        <div className="w-1/2 flex items-center justify-center">
+          {isAddModalOpen && (
+            <AddCategoryModal
+              isOpen={isAddModalOpen}
+              onClose={() => setIsAddModalOpen(false)}
+              onSubmit={handleAddCategory}
+              isDarkMode={isDarkMode}
+            />
+          )}
+
+          {isModifyModalOpen && selectedCategory && (
+            <ModifyCategoryModal
+              isOpen={isModifyModalOpen}
+              onClose={() => setIsModifyModalOpen(false)}
+              category={selectedCategory}
+              onModify={handleModifyCategory}
+              onDelete={handleDeleteCategory}
+              isDarkMode={isDarkMode}
+            />
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

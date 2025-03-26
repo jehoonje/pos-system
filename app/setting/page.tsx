@@ -46,7 +46,7 @@ export default function SettingPage() {
       
       // 다크모드 배경색 적용
       if (isDarkMode) {
-        document.body.style.backgroundColor = "#222";
+        document.body.style.backgroundColor = "#111827";
       } else {
         document.body.style.backgroundColor = "";
       }
@@ -185,42 +185,42 @@ export default function SettingPage() {
             <div className="grid grid-cols-3 gap-8 w-full relative">
               <button
                 onClick={handleOrdersClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white hover:bg-[#333] rounded-lg shadow-sm`}
+                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
               >
                 <ShoppingBag className="w-6 h-6 mr-2 ml-10" />
                 Orders
               </button>
               <button
                 onClick={handleManagementClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white hover:bg-[#333] rounded-lg shadow-sm`}
+                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
               >
                 <SquareChartGantt className="w-6 h-6 mr-2 ml-10" />
                 Management
               </button>
               <button
                 onClick={handleTransferClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white hover:bg-[#333] rounded-lg shadow-sm`}
+                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
               >
                 <ArrowRightLeft className="w-6 h-6 mr-2 ml-10" />
                 Transfer
               </button>
               <button
                 onClick={handleItemsClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white hover:bg-[#333] rounded-lg shadow-sm`}
+                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
               >
                 <Archive className="w-6 h-6 mr-2 ml-10" />
                 Items
               </button>
               <button
                 onClick={handleSettingClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white hover:bg-[#333] rounded-lg shadow-sm`}
+                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"}  rounded-lg shadow-sm`}
               >
                 <Settings className="w-6 h-6 mr-2 ml-10" />
                 Setting
               </button>
               <button
                 onClick={handleCloseClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white hover:bg-[#333] rounded-lg shadow-sm`}
+                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"}  rounded-lg shadow-sm`}
               >
                 <PanelRightClose className="w-6 h-6 mr-2 ml-10" />
                 Close
@@ -244,13 +244,13 @@ export default function SettingPage() {
             <div className="flex flex-row gap-4">
               <button
                 onClick={handleEditItems}
-                className={`w-52 h-14 font-bold ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white hover:bg-[#333] rounded-lg shadow-sm`}
+                className={`w-52 h-14 font-bold ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"}  rounded-lg shadow-sm`}
               >
                 Edit Items
               </button>
               <button
                 onClick={handleEditCategories}
-                className={`w-52 h-14 font-bold ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white hover:bg-[#333] rounded-lg shadow-sm`}
+                className={`w-52 h-14 font-bold ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
               >
                 Edit Categories
               </button>

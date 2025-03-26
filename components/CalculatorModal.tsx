@@ -4,7 +4,11 @@ import { useFormStore } from "@/store/formStore";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function CalculatorModal() {
+interface CalculatorModalProps {
+  isDarkMode?: boolean;
+}
+
+export default function CalculatorModal({ isDarkMode = false }: CalculatorModalProps) {
   const { isCalculatorModalOpen, setCalculatorModalOpen } = useFormStore();
   const [display, setDisplay] = useState<string>("0");
   const [currentValue, setCurrentValue] = useState<string>("");
@@ -142,7 +146,7 @@ export default function CalculatorModal() {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
         ref={modalRef}
-        className="absolute cursor-grabbing bg-gray-700 rounded-lg shadow-lg p-4 w-80 z-50"
+        className={`absolute cursor-grabbing ${isDarkMode ? 'bg-gray-800' : 'bg-gray-700'} rounded-lg shadow-lg p-4 w-80 z-50`}
         style={{
           transform: `translate(${position.x}px, ${position.y}px)`,
           transition: "transform 0.1s ease-out", // 부드러운 이동 효과
@@ -150,119 +154,119 @@ export default function CalculatorModal() {
         onMouseDown={handleMouseDown}
       >
         <h2 className="text-lg text-white font-medium mb-2 cursor-move"></h2>
-        <div className="bg-gray-100 p-4 rounded-lg opacity-50 mb-4 text-right text-xl font-mono">
+        <div className={`${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100'} p-4 rounded-lg opacity-${isDarkMode ? '80' : '50'} mb-4 text-right text-xl font-mono`}>
           {display}
         </div>
         <div className="grid grid-cols-4 gap-2">
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={handleClearClick}
           >
             C
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleOperatorClick("/")}
           >
             ÷
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleOperatorClick("*")}
           >
             ×
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleOperatorClick("-")}
           >
             −
           </button>
 
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("7")}
           >
             7
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("8")}
           >
             8
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("9")}
           >
             9
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleOperatorClick("+")}
           >
             +
           </button>
 
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("4")}
           >
             4
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("5")}
           >
             5
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("6")}
           >
             6
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200 row-span-2"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg row-span-2`}
             onClick={handleEqualsClick}
           >
             =
           </button>
 
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("1")}
           >
             1
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("2")}
           >
             2
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick("3")}
           >
             3
           </button>
 
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200 col-span-2"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg col-span-2`}
             onClick={() => handleNumberClick("0")}
           >
             0
           </button>
           <button
-            className="bg-gray-100 rounded p-4 text-lg hover:bg-gray-200"
+            className={`${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} rounded p-4 text-lg`}
             onClick={() => handleNumberClick(".")}
           >
             .
           </button>
         </div>
         <button
-          className="bg-gray-200 rounded p-2 w-full mt-4"
+          className={`${isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} rounded p-2 w-full mt-4`}
           onClick={() => setCalculatorModalOpen(false)}
         >
           Close
