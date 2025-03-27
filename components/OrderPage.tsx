@@ -420,7 +420,7 @@ export default function OrderPage() {
 
   return (
     <div className={`flex items-center font-mono justify-center h-screen w-screen relative ${isDarkMode ? 'bg-gray-900' : ''}`}>
-      <div className={`relative w-4/5 h-4/5 border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} rounded-2xl flex overflow-hidden`}>
+      <div className={`relative w-[95%] max-w-7xl h-[90%] max-h-[900px] ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} border rounded-2xl flex overflow-hidden`}>
         {isMonthly && storeId ? (
           <MonthlyCalendar
             orderSummaries={orderSummaries || []}
@@ -464,9 +464,9 @@ export default function OrderPage() {
               />
             </div>
             
-            <Modal isOpen={isRefundModalOpen} onClose={() => setIsRefundModalOpen(false)} isDarkMode={isDarkMode}>
+            <Modal isOpen={isRefundModalOpen} onClose={() => setIsRefundModalOpen(false)}>
               <div className="text-center">
-                <p className={`mb-4 ${isDarkMode ? 'text-white' : ''}`}>결제를 취소하시겠습니까?</p>
+                <p className={"mb-4"}>결제를 취소하시겠습니까?</p>
                 <div className="flex justify-center gap-4">
                   <button
                     className="bg-red-500 text-white px-8 py-1 rounded hover:bg-red-600"
@@ -475,7 +475,7 @@ export default function OrderPage() {
                     예
                   </button>
                   <button
-                    className={`${isDarkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400'} px-4 py-1 rounded`}
+                    className={"bg-gray-300 hover:bg-gray-400 px-4 py-1 rounded"}
                     onClick={() => setIsRefundModalOpen(false)}
                   >
                     아니오

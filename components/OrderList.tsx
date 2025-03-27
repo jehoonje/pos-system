@@ -65,7 +65,7 @@ const OrderList: React.FC<OrderListProps> = ({
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className={`w-1/2 ${isDarkMode ? 'border-r border-gray-700' : 'border-r border-gray-400'}`}>
+    <div className={`w-2/5 ${isDarkMode ? 'border-r border-gray-700' : 'border-r border-gray-400'}`}>
       <div className={`h-[3rem] ${isDarkMode ? 'border-b border-gray-700 text-white' : 'border-b border-gray-400'} flex justify-center items-center`}>
         <span>{isCancelled ? "Return" : "Daily"}</span>
       </div>

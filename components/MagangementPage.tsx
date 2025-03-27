@@ -773,8 +773,8 @@ export default function ManagementPage() {
   );
 
   return (
-    <div className={`flex items-center font-mono  justify-center min-h-screen w-full relative p-2 sm:p-4 ${isDarkMode ? 'bg-gray-900' : ''}`}>
-      <div className={`relative w-full max-w-7xl border h-[85vh] ${isDarkMode ? 'bg-gray-800 bg-opacity-90 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} rounded-2xl flex flex-col md:flex-row overflow-hidden`}>
+    <div className={`flex items-center font-mono justify-center h-screen w-screen relative ${isDarkMode ? 'bg-gray-900' : ''}`}>
+      <div className={`relative w-[95%] max-w-7xl h-[90%] max-h-[900px] ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} border rounded-2xl flex overflow-hidden`}>
         <div className={`w-3/4 h-full ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} flex flex-col`}>
           <div className="flex-grow relative">
             <AnimatePresence mode="sync">

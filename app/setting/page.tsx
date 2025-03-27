@@ -106,6 +106,9 @@ export default function SettingPage() {
   };
 
   const handleOrdersClick = () => {
+    setIsLoading(true); // 로딩 시작
+    
+    // 페이지 이동 후에도 로딩 상태가 유지되도록 타임아웃 없이 바로 라우팅
     router.push("/setting/orders");
   };
 
@@ -160,12 +163,19 @@ export default function SettingPage() {
 
   // 로딩 중이면 스피너 표시
   if (isLoading) {
-    return <Spinner />;
+    return (
+      <div className={`flex items-center justify-center h-screen w-screen ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+        <Spinner />
+      </div>
+    );
   }
+
+  // 버튼 공통 스타일 함수
+  const buttonClass = `font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm transition-all duration-200`;
 
   return (
     <div className={`flex items-center font-mono justify-center h-screen w-screen relative ${isDarkMode ? 'bg-gray-900' : ''}`}>
-      <div className={`relative w-4/5 h-4/5 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} border rounded-2xl p-6 flex flex-col justify-center items-center`}>
+      <div className={`relative w-[95%] max-w-7xl h-[90%] max-h-[900px] ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white bg-opacity-20 border-gray-400'} border rounded-2xl p-4 sm:p-6 flex flex-col justify-center items-center`}>
         <button
           onClick={handleBackClick}
           className={`absolute top-0 left-0 bg-transparent px-2 py-2 ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-500 hover:text-gray-400'} text-sm rounded`}
@@ -175,55 +185,55 @@ export default function SettingPage() {
 
         {showMainUI && (
           <div
-            className={`flex flex-col items-center justify-start ${
+            className={`flex flex-col w-full items-center justify-start ${
               fadeOutMainUI ? "fade-out fade-out-active" : ""
             }`}
           >
-            <h1 className={`text-[40px] font-sans font-bold mb-[120px] ${isDarkMode ? "text-white" : "text-gray-700"}`}>
+            <h1 className={`text-2xl sm:text-3xl md:text-4xl font-sans font-bold mb-8 sm:mb-16 md:mb-20 lg:mb-24 ${isDarkMode ? "text-white" : "text-gray-700"}`}>
               Customize POS Settings
             </h1>
-            <div className="grid grid-cols-3 gap-8 w-full relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8 w-full max-w-5xl px-2">
               <button
                 onClick={handleOrdersClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
+                className={`${buttonClass} h-16 sm:h-20 w-full p-2 sm:p-4`}
               >
-                <ShoppingBag className="w-6 h-6 mr-2 ml-10" />
-                Orders
+                <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 mr-2 ml-2 sm:ml-4 md:ml-6 lg:ml-8" />
+                <span className="text-sm sm:text-base">Orders</span>
               </button>
               <button
                 onClick={handleManagementClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
+                className={`${buttonClass} h-16 sm:h-20 w-full p-2 sm:p-4`}
               >
-                <SquareChartGantt className="w-6 h-6 mr-2 ml-10" />
-                Management
+                <SquareChartGantt className="w-5 h-5 sm:w-6 sm:h-6 mr-2 ml-2 sm:ml-4 md:ml-6 lg:ml-8" />
+                <span className="text-sm sm:text-base">Management</span>
               </button>
               <button
                 onClick={handleTransferClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
+                className={`${buttonClass} h-16 sm:h-20 w-full p-2 sm:p-4`}
               >
-                <ArrowRightLeft className="w-6 h-6 mr-2 ml-10" />
-                Transfer
+                <ArrowRightLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2 ml-2 sm:ml-4 md:ml-6 lg:ml-8" />
+                <span className="text-sm sm:text-base">Transfer</span>
               </button>
               <button
                 onClick={handleItemsClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
+                className={`${buttonClass} h-16 sm:h-20 w-full p-2 sm:p-4`}
               >
-                <Archive className="w-6 h-6 mr-2 ml-10" />
-                Items
+                <Archive className="w-5 h-5 sm:w-6 sm:h-6 mr-2 ml-2 sm:ml-4 md:ml-6 lg:ml-8" />
+                <span className="text-sm sm:text-base">Items</span>
               </button>
               <button
                 onClick={handleSettingClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"}  rounded-lg shadow-sm`}
+                className={`${buttonClass} h-16 sm:h-20 w-full p-2 sm:p-4`}
               >
-                <Settings className="w-6 h-6 mr-2 ml-10" />
-                Setting
+                <Settings className="w-5 h-5 sm:w-6 sm:h-6 mr-2 ml-2 sm:ml-4 md:ml-6 lg:ml-8" />
+                <span className="text-sm sm:text-base">Setting</span>
               </button>
               <button
                 onClick={handleCloseClick}
-                className={`w-80 h-20 font-bold text-left flex flex-row items-center ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"}  rounded-lg shadow-sm`}
+                className={`${buttonClass} h-16 sm:h-20 w-full p-2 sm:p-4`}
               >
-                <PanelRightClose className="w-6 h-6 mr-2 ml-10" />
-                Close
+                <PanelRightClose className="w-5 h-5 sm:w-6 sm:h-6 mr-2 ml-2 sm:ml-4 md:ml-6 lg:ml-8" />
+                <span className="text-sm sm:text-base">Close</span>
               </button>
             </div>
           </div>
@@ -239,20 +249,22 @@ export default function SettingPage() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
+              width: "90%",
+              maxWidth: "600px"
             }}
           >
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full">
               <button
                 onClick={handleEditItems}
-                className={`w-52 h-14 font-bold ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"}  rounded-lg shadow-sm`}
+                className={`${buttonClass} w-full sm:w-1/2 h-14 sm:h-16 p-2 sm:p-4 flex justify-center`}
               >
-                Edit Items
+                <span className="text-sm sm:text-base">Edit Items</span>
               </button>
               <button
                 onClick={handleEditCategories}
-                className={`w-52 h-14 font-bold ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-transparent text-gray-900 border-gray-500'} border hover:text-white ${isDarkMode ? "hover:bg-[#111827]": "hover:bg-[#333]"} rounded-lg shadow-sm`}
+                className={`${buttonClass} w-full sm:w-1/2 h-14 sm:h-16 p-2 sm:p-4 flex justify-center`}
               >
-                Edit Categories
+                <span className="text-sm sm:text-base">Edit Categories</span>
               </button>
             </div>
           </div>
@@ -268,39 +280,41 @@ export default function SettingPage() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
+              width: "90%",
+              maxWidth: "400px"
             }}
           >
-            <div className="flex flex-col items-center gap-8">
-              <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            <div className="flex flex-col items-center gap-6 sm:gap-8">
+              <h2 className={`text-xl sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Theme Settings
               </h2>
               
-              <div className="flex flex-col items-center gap-6">
-                <div className="flex items-center justify-between w-64">
+              <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
+                <div className="flex items-center justify-between w-full max-w-xs">
                   <span className={`${isDarkMode ? 'text-white' : 'text-gray-900'} font-medium flex items-center gap-2`}>
                     {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
                     {isDarkMode ? "Dark Mode" : "Light Mode"}
                   </span>
                   <button 
                     onClick={handleToggleDarkMode}
-                    className={`relative w-16 h-8 transition-colors duration-300 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}
+                    className={`relative w-14 sm:w-16 h-7 sm:h-8 transition-colors duration-300 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`}
                     aria-label="Toggle dark mode"
                   >
                     <div 
-                      className={`absolute w-6 h-6 bg-white rounded-full transform transition-transform duration-300 ${isDarkMode ? 'translate-x-8' : 'translate-x-1'} top-1`} 
+                      className={`absolute w-5 sm:w-6 h-5 sm:h-6 bg-white rounded-full transform transition-transform duration-300 ${isDarkMode ? 'translate-x-7 sm:translate-x-8' : 'translate-x-1'} top-1`} 
                     />
                   </button>
                 </div>
                 
-                <div className={`mt-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <div className={`mt-2 sm:mt-4 text-xs sm:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                   Toggle to change system background color
                 </div>
                 
-                <div className="flex flex-row gap-4 mt-4">
-                  <div className="w-12 h-12 rounded-md bg-white border border-gray-300 flex items-center justify-center">
+                <div className="flex flex-row gap-3 sm:gap-4 mt-2 sm:mt-4">
+                  <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-md bg-white border border-gray-300 flex items-center justify-center">
                     <span className="text-xs text-black">Light</span>
                   </div>
-                  <div className="w-12 h-12 rounded-md bg-[#222] border border-gray-700 flex items-center justify-center">
+                  <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-md bg-[#222] border border-gray-700 flex items-center justify-center">
                     <span className="text-xs text-white">Dark</span>
                   </div>
                 </div>
@@ -311,7 +325,7 @@ export default function SettingPage() {
 
         {showCloseModal && (
           <Modal isOpen={showCloseModal} onClose={() => setShowCloseModal(false)}>
-            <span className={`text-md mb-4 ${isDarkMode ? 'text-white' : ''}`}>영업을 마감하시겠습니까?</span>
+            <span className={"text-md mb-4 text-black"}>영업을 마감하시겠습니까?</span>
             <div className="flex space-x-4">
               <button
                 onClick={handleCloseBusiness}
@@ -321,7 +335,7 @@ export default function SettingPage() {
               </button>
               <button
                 onClick={() => setShowCloseModal(false)}
-                className={`px-4 border ${isDarkMode ? 'border-gray-600 hover:bg-gray-600 text-white' : 'border-gray-400 hover:bg-gray-400'} rounded transition`}
+                className={"px-4 border border-gray-400 hover:bg-gray-400 text-black rounded transition"}
               >
                 아니오
               </button>
@@ -339,22 +353,22 @@ export default function SettingPage() {
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
               <motion.div
-                className={`relative w-[400px] h-[220px] rounded-lg shadow-lg border ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-white/30 bg-white'} p-6`}
+                className={`relative w-[90%] max-w-[400px] h-auto min-h-[200px] rounded-lg shadow-lg border ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-white/30 bg-white'} p-4 sm:p-6`}
                 initial={{ scale: 0.9, opacity: 0, y: 0 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
                 <div className={`flex flex-col items-center justify-center h-full ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                  <span className="text-lg font-medium mb-2 text-red-500">
+                  <span className="text-base sm:text-lg font-medium mb-2 text-red-500">
                     영업 마감 불가
                   </span>
-                  <span className="text-md mb-6 text-center">
+                  <span className="text-sm sm:text-md mb-6 text-center">
                     {incompleteOrderMessage}
                   </span>
                   <button
                     onClick={() => setShowIncompleteOrderModal(false)}
-                    className={`px-7 py-2 border ${isDarkMode ? 'border-gray-600 hover:bg-gray-600' : 'border-gray-400 hover:bg-gray-400'} rounded transition`}
+                    className={`px-5 sm:px-7 py-1.5 sm:py-2 border ${isDarkMode ? 'border-gray-600 hover:bg-gray-600' : 'border-gray-400 hover:bg-gray-400'} rounded transition`}
                   >
                     확인
                   </button>

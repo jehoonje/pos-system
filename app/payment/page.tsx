@@ -556,12 +556,12 @@ export default function PaymentPage() {
               layout
               animate={{ x: 0, width: isSplitVisible ? "49%" : "100%" }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={`py-2 rounded-md border ${
+              className={`py-2 rounded-md ${
                 charge + paidByCard + paidByCash >= initialTotal
                   ? "bg-[#007aff] text-white font-bold"
                   : isDarkMode 
-                    ? "bg-gray-700 text-gray-400 border-gray-600 cursor-not-allowed" 
-                    : "bg-gray-200 text-gray-700 border-gray-300 cursor-not-allowed"
+                    ? "bg-gray-700 text-gray-400 border-none cursor-not-allowed" 
+                    : "bg-gray-200 text-gray-700 border-none cursor-not-allowed"
               } flex items-center justify-center`}
               disabled={charge + paidByCard + paidByCash < initialTotal}
             >
@@ -608,8 +608,8 @@ export default function PaymentPage() {
       </AnimatePresence>
 
       {/* 영수증 출력 여부 확인 모달 */}
-      <Modal isOpen={showReceiptModal} onClose={handleReceiptYes} isDarkMode={isDarkMode}>
-        <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'} p-6 rounded-md`}>
+      <Modal isOpen={showReceiptModal} onClose={handleReceiptYes}>
+        <div className={"bg-white p-6 rounded-md"}>
           <p>영수증을 출력하시겠습니까?</p>
           <div className="mt-4 flex justify-end space-x-9">
             <button
@@ -620,7 +620,7 @@ export default function PaymentPage() {
             </button>
             <button
               onClick={handleReceiptYes}
-              className={`py-1 px-4 ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-100'} rounded-md`}
+              className={`py-1 px-4 bg-gray-200 hover:bg-gray-100 rounded-md`}
             >
               아니오
             </button>
