@@ -24,17 +24,16 @@ export default async function PosPage() {
   
   if (storeId) {
     try {
-      // 카테고리 데이터 가져오기
+      // 서버에서 데이터 가져오기 시도
       initialCategories = await fetchServerCategories(storeId);
       
-      // 첫 번째 카테고리의 메뉴 데이터 가져오기
       if (initialCategories.length > 0) {
         const firstCategoryId = initialCategories[0].categoryId;
         initialMenus = await fetchServerMenus(storeId, firstCategoryId);
       }
     } catch (error) {
       console.error('서버에서 초기 데이터 로딩 실패:', error);
-      // 에러 처리는 클라이언트에서 추가로 수행
+      // 에러가 발생했지만 여기서 막지 않음 - 클라이언트에서 다시 시도
     }
   }
   
