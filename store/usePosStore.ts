@@ -62,6 +62,9 @@ interface PosState {
   selectedItems: SelectedItem[];
 
   isLoading: boolean;
+  
+
+  setIsLoading: (loading: boolean) => void;
 
   setPlaceId: (id: number | null) => void;
   setOrderId: (id: number | null) => void;
@@ -85,6 +88,10 @@ interface PosState {
   clearItems: () => void;
 
   resetData: () => void;
+  
+  // 서버 컴포넌트에서 받은 데이터를 직접 설정하는 액션
+  setCategories: (categories: Category[]) => void;
+  setCurrentMenus: (menus: Menu[]) => void;
 }
 
 // 새로운 스토어 인터페이스 정의 (기존 타입 재사용 가능)
@@ -94,6 +101,8 @@ interface NewStoreState {
   newSelectedItems: SelectedItem[]; // 기존 SelectedItem 타입 재사용
   addNewItem: (item: SelectedItem) => void; // 새로운 아이템 추가
   clearNewItems: () => void; // 새로운 아이템 삭제
+  setNewStoreId: (id: any) => void; // 새로운 매장 ID 설정
+  setNewTableName: (name: any) => void; // 새로운 테이블 이름 설정
 }
 
 // POS 스토어 생성
@@ -126,11 +135,17 @@ export const usePosStore = create<PosState>((set, get) => ({
   },
   setTableName: (name) => set({ tableName: name }), // 테이블 이름 설정
 
+  setIsLoading: (loading) => set({ isLoading: loading }),
+  
   setPlaceId: (id) => set({ placeId: id }), // 장소 ID 설정
   setOrderId: (id) => set({ orderId: id }), // 주문 ID 설정
   setorderMenuId: (id) => set({ orderMenuId: id }), // 주문 메뉴 ID 설정 (수정: orderId -> orderMenuId)
 
   setSelectedItems: (items) => set({ selectedItems: items }), // 선택된 아이템 설정
+
+  // 서버 컴포넌트에서 받은 데이터를 직접 설정하는 액션
+  setCategories: (categories) => set({ categories }),
+  setCurrentMenus: (menus) => set({ currentMenus: menus, isLoading: false }),
 
   fetchCategories: async (storeId: number) => {
     try {

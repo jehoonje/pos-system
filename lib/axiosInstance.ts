@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 const API_BASE_URL = "http://52.79.57.150:8383"; // 백엔드 서버 주소
 
 const axiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: 'api',
   headers: {
     "Content-Type": "application/json",
   },

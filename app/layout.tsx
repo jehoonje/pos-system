@@ -1,6 +1,4 @@
 "use client";
-
-import { AnimatePresence, motion } from "framer-motion";
 import "./globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
