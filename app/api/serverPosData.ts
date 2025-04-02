@@ -1,7 +1,8 @@
 // api/serverPosData.ts
 import { headers } from 'next/headers';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+// 서버 컴포넌트에서 절대 경로 대신 상대 경로 사용
+const API_BASE_PATH = '/api';
 
 // 서버에서 인증 토큰 가져오기
 function getAuthHeader() {
@@ -22,7 +23,12 @@ export async function fetchServerCategories(storeId: number) {
   
   try {
     const authHeaders = getAuthHeader();
-    const response = await fetch(`${API_URL}/api/categories/all/${storeId}`, {
+    
+    // 상대 경로 사용
+    const url = `${API_BASE_PATH}/categories/all/${storeId}`;
+    console.log('서버 컴포넌트에서 API 요청:', url);
+    
+    const response = await fetch(url, {
       headers: authHeaders,
       cache: 'no-store'
     });
@@ -44,7 +50,12 @@ export async function fetchServerMenus(storeId: number, categoryId: number) {
   
   try {
     const authHeaders = getAuthHeader();
-    const response = await fetch(`${API_URL}/api/menus/all/${categoryId}?storeId=${storeId}`, {
+    
+    // 상대 경로 사용
+    const url = `${API_BASE_PATH}/menus/all/${categoryId}?storeId=${storeId}`;
+    console.log('서버 컴포넌트에서 API 요청:', url);
+    
+    const response = await fetch(url, {
       headers: authHeaders,
       cache: 'no-store'
     });
