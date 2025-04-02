@@ -74,15 +74,17 @@ export function PosClient({
     }
   }, [isDarkMode]);
 
-  // 초기 데이터로 한 번만 상태 초기화 (초기화 완료 후 더 이상 실행되지 않음)
-  useEffect(() => {
-    // 이미 초기화되었으면 실행하지 않음
-    if (initializedRef.current) return;
+  // 서버에서 받은 초기 데이터로 상태 초기화 (데이터가 없으면 클라이언트에서 로드)
+useEffect(() => {
+  // 이미 초기화되었으면 실행하지 않음
+  if (initializedRef.current) return;
+  
+  if (initialStoreId) {
+    setStoreId(initialStoreId);
     
-    if (initialStoreId && initialCategories?.length > 0) {
-      console.log('초기 데이터로 상태 초기화');
-      
-      setStoreId(initialStoreId);
+    // 서버에서 가져온 데이터가 있으면 사용
+    if (initialCategories?.length > 0) {
+      console.log('서버에서 가져온 데이터로 초기화');
       setCategories(initialCategories);
       
       const firstCategoryId = initialCategories[0]?.categoryId;
@@ -94,11 +96,27 @@ export function PosClient({
       if (initialMenus?.length > 0) {
         setCurrentMenus(initialMenus);
       }
-      
-      // 초기화 완료 표시
-      initializedRef.current = true;
+    } 
+    // 서버 데이터가 없으면 클라이언트에서 다시 로드
+    else {
+      console.log('서버 데이터 없음, 클라이언트에서 로드');
+      setIsLoading(true);
+      fetchCategories(initialStoreId).then(() => {
+        const currentCategories = usePosStore.getState().categories;
+        if (currentCategories.length > 0) {
+          const firstCategoryId = currentCategories[0].categoryId;
+          setSelectedCategoryId(firstCategoryId);
+          userSelectedCategoryRef.current = firstCategoryId;
+          fetchMenusByCategory(firstCategoryId, true);
+        }
+      });
     }
-  }, [initialStoreId, initialCategories, initialMenus, setStoreId, setCategories, setCurrentMenus]);
+    
+    // 초기화 완료 표시
+    initializedRef.current = true;
+  }
+}, [initialStoreId, initialCategories, initialMenus, setStoreId, setCategories, setCurrentMenus, fetchCategories, fetchMenusByCategory, setIsLoading]);
+
 
   // 카테고리 ID 변경 시 메뉴 로드 (사용자 선택 처리)
   useEffect(() => {
